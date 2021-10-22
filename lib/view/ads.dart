@@ -74,8 +74,7 @@ class _AdsViewState extends State<AdsView> {
              GetBuilder<CategoryController>(
               init: CategoryController(),
                 builder: (dat){
-                  return  
-                  dat.datacateg.length == 0 ? PlayStoreShimmer()
+                  return   dat.datacateg.length == 0 ? PlayStoreShimmer()
                   :
                   advertisingList(Get.height/5.5,Get.width/3.7,Get.width < 420 ? Get.height/7.5: Get.height/7.5,dat.datacateg);
                 }
