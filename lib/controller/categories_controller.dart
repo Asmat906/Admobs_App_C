@@ -10,12 +10,12 @@ class CategoryController extends GetxController {
   var subCat ;
   var subCatt;
   var havingAddsList, myHavingAdds;
-  List datacateg = [];
+  var datacateg = [];
   List datacategTypes = [];
   @override
   void onInit(){
     isLoading = true;
-    // datacateg = [];
+    datacateg = [];
     super.onInit();
     // getCategoryNames();
   }
@@ -47,6 +47,7 @@ class CategoryController extends GetxController {
     await havingAdds().then((value) {
       isLoading = true ;
       havingAddsList =  jsonDecode(value.body);
+      print("habingdfashdfjs....$havingAddsList");
      isLoading = false;
     });
     

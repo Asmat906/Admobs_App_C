@@ -9,6 +9,7 @@ class UserProfileController extends GetxController {
   bool isLoading = false; 
   var userData;
   var userData2;
+  var proupdate;
   GetStorage box = GetStorage();
     @override
   void onInit(){
@@ -41,4 +42,11 @@ getUseradProfile(id) async{
     update();
   }
 
+  updateProfile(data) async{
+     await userProfileUpdate(data).then((res) {
+        proupdate = jsonDecode(res.body);
+        isLoading = false;
+      });
+      update();
+  }
 }

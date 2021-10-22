@@ -4,6 +4,7 @@ import 'package:success_stations/utils/app_headers.dart';
 import 'package:success_stations/utils/config.dart';
 
 Future<http.Response> draftAdsAction() async {
+ // ignore: unused_local_variable
  var id;
   GetStorage box = GetStorage();
   id  = box.read('user_id');

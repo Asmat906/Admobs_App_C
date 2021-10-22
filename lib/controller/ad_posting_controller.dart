@@ -6,8 +6,8 @@ import 'package:success_stations/action/ad_post_action.dart';
 import 'package:success_stations/styling/colors.dart';
 import 'package:success_stations/utils/app_headers.dart';
 import 'package:success_stations/utils/config.dart';
-import 'package:success_stations/view/auth/my_adds/draft_ads_list.dart';
 import 'package:success_stations/view/auth/my_adds/my_adds.dart';
+// ignore: implementation_imports
 import 'package:dio/src/response.dart' as response;
 
 class  AdPostingController extends GetxController {
@@ -21,6 +21,7 @@ class  AdPostingController extends GetxController {
    finalAdPosting(dataa) async {
      isLoading(true);
      await adPosting(dataa).then((res) {    
+      // ignore: unused_local_variable
       var data = jsonDecode(res.body);
       if(res.statusCode == 200 || res.statusCode < 400){
         adpost = jsonDecode(res.body); 
@@ -59,15 +60,14 @@ class  AdPostingController extends GetxController {
       adpost = result.data;
       if(result.data['success'] == true){
          isLoading(true);
-         Get.to(DraftAds());
+         Get.toNamed('/myDraft');
          Get.snackbar("Ad Drafted Successfully",'',backgroundColor: AppColors.appBarBackGroundColor);
          
       } 
     update();
   }
-
-
     uploadAdImage(data) async {
+      print("/./././././.------$data");
       await ApiHeaders().getData();
       final Config conf = Config();
       String url =conf.baseUrl + "ads/media";
@@ -75,6 +75,7 @@ class  AdPostingController extends GetxController {
         response.Response result =
         await dio.post(url, data: data,options:Options(headers: ApiHeaders().headersWithToken));
       adUpload = result.data;
+      print("/./././././.------$adUpload");
       
     update();
   }

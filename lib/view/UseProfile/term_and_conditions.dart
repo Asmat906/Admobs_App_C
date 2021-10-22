@@ -13,21 +13,17 @@ class TermConditions extends StatefulWidget {
 }
 
 class _TermConditions extends State<TermConditions> {
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // bottomNavigationBar: CustomBottomBar(),
       appBar: PreferredSize( preferredSize: Size.fromHeight(70.0),    
-       child: stringAppbar(context,Icons.arrow_back_ios_new_sharp, 'Privacy',AppImages.appBarSearch),
+        child: stringAppbar(context,Icons.arrow_back_ios_new_sharp, 'Privacy',AppImages.appBarSearch),
       ),
      body: GetBuilder<ContentManagmentController>( 
-          init: ContentManagmentController(),
-          builder:(val) {
-            return val.aboutData != null  ? about(val.aboutData['data']) : Center(child: CircularProgressIndicator());
-    
-          }   
+      init: ContentManagmentController(),
+      builder:(val) {
+        return val.aboutData != null  ? about(val.aboutData['data']) : Center(child: CircularProgressIndicator());
+      }   
      )
    );
   }
@@ -39,7 +35,6 @@ Widget about(data){
     itemCount:  data.length!= null ? data.length : Container(),
     // ignore: non_constant_identifier_names
     itemBuilder: (BuildContext,index) {
-      
       return 
       index == 3 ?
        Column(
@@ -50,16 +45,10 @@ Widget about(data){
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(15, 30, 15, 0),
-            
             child:Html(data: data[index]['page_text']),
-        //     child: Text(data[index]['page_text'],textAlign: TextAlign.center,
-        //     style: AppTextStyles.appTextStyle(
-        //     fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.inputTextColor
-        //  ),),
-        ),   
-        ],
-      ):Container();
+          ),   
+        ]):Container();
       }
-     ),
+    ),
   );
-  }
+}

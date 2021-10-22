@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:success_stations/controller/friends_controloler.dart';
-import 'package:success_stations/controller/offers/offer_filtering_controller.dart';
+import 'package:success_stations/controller/offers/offer_category_controller.dart';
 import 'package:success_stations/controller/rating_controller.dart';
-import 'package:success_stations/controller/user_drafted_controller.dart';
 import 'package:success_stations/styling/colors.dart';
 import 'package:success_stations/view/offers/home_all_offer_detail.dart';
 
@@ -14,60 +12,59 @@ class FilteredCategory extends StatefulWidget {
 }
 
 class _FilteredCtaegPageState extends State<FilteredCategory> {
-  final getData = Get.put(DraftAdsController());
-  final adContr = Get.put(OffersFilteringController());
-  final frindCont = Get.put(FriendsController());
-  //   allWordsCapitilize (String str) {
-  //   return str.toLowerCase().split(' ').map((word) {
-  //     String leftText = (word.length > 1) ? word.substring(1, word.length) : '';
-  //     return word[0].toUpperCase() + leftText;
-  //   }).join(' ');
-  // }
+  final adContr = Get.put(OfferCategoryController());
 
   final ratingFilteringController = Get.put(RatingController());
   var lang;
   bool liked = false;
   var userId;
   GetStorage box = GetStorage();
-  @override
-  // void initState() {
-  //   // adContr.addedAllAds();
-  //   super.initState();
-  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            "filtered_result".tr,
-          ),
-          leading: GestureDetector(
-            onTap: () {
-                Get.back();
-              },
-            child: Icon(Icons.arrow_back_ios_outlined)),
-          backgroundColor: AppColors.appBarBackGroundColor,
-          centerTitle: true,
+      appBar: AppBar(
+         leading: GestureDetector(
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () => Get.back(),
+                child: Container(
+                  margin: EdgeInsets.only(left:10, top:5),
+                  child: Icon(Icons.arrow_back,
+                    color: Colors.white, size: 25
+                  ),
+                ),
+              ),
+            ],
+          )
         ),
-        body: GetBuilder<OffersFilteringController>(
-            init: OffersFilteringController(),
-            builder: (value) {
-              return value.isLoading == true
-                  ? Container()
-                  : value.offerFilterCreate != null &&
-                          value.offerFilterCreate['success'] == true
-                      ? draftedGridlist(value.offerFilterCreate['data'])
-                      : adContr.resultInvalid.isTrue &&
-                              value.offerFilterCreate['success'] == false
-                          ? Container(
-                              margin: EdgeInsets.only(top: Get.height * 0.00),
-                              child: Center(
-                                child: Text(adContr.offerFilterCreate['errors'],
-                                    style: TextStyle(fontSize: 25)),
-                              ))
-                          : Container();
-            }));
+        title: Text(
+          "filtered_result".tr,
+        ),
+        backgroundColor: AppColors.appBarBackGroundColor,
+        centerTitle: true,
+      ),
+      body: GetBuilder<OfferCategoryController>(
+        init: OfferCategoryController(),
+        builder: (value) {
+          return value.isLoading == true? Container()
+          : value.offerFilterCreate != null &&
+          value.offerFilterCreate['success'] == true
+          ? draftedGridlist(value.offerFilterCreate['data'])
+          : adContr.resultInvalid.isTrue &&
+          value.offerFilterCreate['success'] == false
+          ? Container(
+            margin: EdgeInsets.only(top: Get.height * 0.00),
+            child: Center(
+              child: Text(adContr.offerFilterCreate['errors'],
+                style: TextStyle(fontSize: 25)
+              ),
+            )
+          ): Container();
+        }
+      )
+    );
   }
 
   var catAddID;

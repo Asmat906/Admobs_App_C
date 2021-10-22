@@ -12,7 +12,9 @@ import 'package:success_stations/styling/button.dart';
 import 'package:success_stations/styling/colors.dart';
 import 'package:success_stations/styling/get_size.dart';
 import 'package:success_stations/styling/text_field.dart';
-import 'package:success_stations/view/auth/sign_in.dart';
+// ignore: unused_import
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+
 
 DateTime? dateTime;
 var dateFormate = DateFormat("yyyy-MM-dd").format(DateTime.parse(dateTime.toString()));
@@ -23,15 +25,21 @@ class StudentSignUp extends StatefulWidget {
 }
 
 class _SignPageState extends State<StudentSignUp> {
+    var finalDate;
   final countryPut = Get.put(ContryController());
-  var selectedCountry, selectCountry, selectedCity,selectedRegion,selectedUniversity, selectedCollege, selectCollege, mapuni, mapClgSleceted, hintTextCountry,hintRegionText, hintUniText,hintcityText, hintClgText;
+  var selectedCountry,statusSelected, selectCountry, selectedCity,selectedRegion,selectedUniversity, selectedCollege, selectCollege, mapuni, mapClgSleceted, hintTextCountry,hintRegionText, hintUniText,hintcityText, hintClgText;
 
   late String firstName, emailSaved, mobileSaved, dobSaved;
+   var arrayDataDegree = ['Diploma, Bachelor, Masrter, Doctorate'];
+    bool passwordVisible = true;
+     bool isvisible = true;
 
   final formKey = GlobalKey<FormState>();
    GetStorage box = GetStorage();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
+  final TextEditingController passController = TextEditingController();
+  final TextEditingController conPassController = TextEditingController();
   final TextEditingController dobController = TextEditingController();
   final TextEditingController mobileController = TextEditingController();
   final TextEditingController semesterController = TextEditingController();
@@ -39,11 +47,14 @@ class _SignPageState extends State<StudentSignUp> {
   final TextEditingController aboutController = TextEditingController();
   final TextEditingController degreeController = TextEditingController();
   String initialCountry = 'PK';
+  var number;
+  var passwordValue,confirmPasswordValue;
+ 
   PhoneNumber tttt = PhoneNumber(isoCode: '');
 
   bool _isChecked = false;
   var myTest;
-  var countryIdGet, shortCodeAdd;
+  var countryIdGet, shortCodeAdd,confirmDate;
 
  
   final signUpCont = Get.put(SignUpController());
@@ -53,8 +64,12 @@ class _SignPageState extends State<StudentSignUp> {
     lang = box.read('lang_code');
     countryPut.getCountries();
     countryIdGet = Get.arguments;
-    myTest = countryIdGet[0].toString();
+    print("argumentss.........$countryIdGet");
+    myTest = countryIdGet['short_code'];
     tttt = PhoneNumber(isoCode: myTest);
+    hintTextCountry = countryIdGet['name'][lang];
+    selectedCountry = countryIdGet['id'];
+     countryPut.getRegion(selectedCountry);
     super.initState();
   }
 
@@ -65,7 +80,9 @@ class _SignPageState extends State<StudentSignUp> {
       var json = {
         "name": nameController.text,
         'email': emailController.text,
-        "mobile": mobileController.text,
+        'password':passwordValue,
+        "password_confirmation":confirmPasswordValue,
+        "mobile": number.toString(),
         "country_id": selectedCountry,
         "city_id": selectedCity,
         "region_id": selectedRegion,
@@ -73,12 +90,10 @@ class _SignPageState extends State<StudentSignUp> {
         "date_of_birth": finalDate,
         "college_id": selectedCollege,
         'university_id': selectedUniversity,
-        'semester': semesterController.text,
-        'address': addressController.text,
         'about': aboutController.text,
-        'degree': degreeController.text
+        'degree': statusSelected
       };
-      
+      print("json of tyhe student.............$json");
       signUpCont.createAccountData(json);
     }
   }
@@ -97,32 +112,17 @@ class _SignPageState extends State<StudentSignUp> {
             fullNameStudent(),
             space10,
             // SizedBox(height:10),
-            eMail(),
-            // GetBuilder<SignUpController>(
-            //   init: SignUpController(),
-            //   builder: (val){
-            //     return  signUpCont.resultInvalid.isTrue ? Container(
-            //       margin:EdgeInsets.only(left:10),
-            //       alignment: Alignment.topLeft,
-            //       child: Container(
-            //           margin:EdgeInsets.only(left:10),
-            //         alignment: Alignment.topLeft,
-            //         child: Text(signUpCont.signup['errors']['email'][0],
-            //         style: TextStyle(color: Colors.red),)
-            //       )
-            //       ):Container();
-
-              //    }),
-              
-              // SizedBox(height:10),
+              eMail(),
+              space10,
+              password(),
+              space10,
+              confirmPassword(),
               space10,
               mobile(),
-              space10,
-              address(),
-              space10,
-              about(),
-              space10,
-              degree(),
+              // space10,
+              // address(),
+              
+              
               space10,
               studentdob(),
               GetBuilder<ContryController>(
@@ -149,13 +149,9 @@ class _SignPageState extends State<StudentSignUp> {
               GetBuilder<UniversityController>(
                 init: UniversityController(),
                 builder: (val){
-                  return university(val.dataUni);
+                  return  university(val.dataUni);
                 },
-              ),
-              space10,
-              semester(),
-              
-              space10,
+              ),space10,
               GetBuilder<CollegeController>(
                 init: CollegeController(),
                 builder: (val){
@@ -163,14 +159,17 @@ class _SignPageState extends State<StudentSignUp> {
                 },
               ),
               space10,
+              degree(),
+              space10,
+              about(),
+              space10,
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Transform.scale(
                     scale: .9,
                     child: new Checkbox(
-                      
-                      activeColor: Colors.blue,
+                      activeColor: AppColors.appBarBackGroundColor,
                       value: _isChecked,
                       onChanged: (value) {
                         setState(() {
@@ -211,7 +210,7 @@ class _SignPageState extends State<StudentSignUp> {
               space20,
               GestureDetector(
                 onTap: (){
-                  Get.to(SignIn());
+                  Get.toNamed('/login');
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -240,19 +239,15 @@ class _SignPageState extends State<StudentSignUp> {
         contentPadding: lang == 'ar'? EdgeInsets.only(right:10) :EdgeInsets.only(left:10),
         isObscure: false,
         hintText: 'full_name'.tr,
-        hintStyle: TextStyle(fontSize: 16, color: AppColors.inputTextColor),
-        hintColor: AppColors.inputTextColor,
+        hintStyle: TextStyle(fontSize: lang == 'ar' ? 14 : 16, color: AppColors.inputTextColor),
+        hintColor:   lang == 'ar'? AppColors.inputTextColor:AppColors.inputTextColor ,
         onChanged: (value) {},
         onFieldSubmitted: (value) {},
         textController: nameController,
         onSaved: (newValue) {},
         validator: (value) {
-          String patttern = r'(^[a-zA-Z ]*$)';
-          RegExp regExp = RegExp(patttern);
           if (value.length == 0) {
             return "namereq".tr;
-          } else if (!regExp.hasMatch(value)) {
-            return "Name must be a-z and A-Z";
           } else
             return null;
         },
@@ -263,28 +258,24 @@ class _SignPageState extends State<StudentSignUp> {
 
   Widget semester() {
     return Container(
-      margin: EdgeInsets.only(left: 20, right: 20),
+      margin: EdgeInsets.only(left:20,right: 20),
       width: Get.width * 0.9,
       child: CustomTextFiled(
-        contentPadding: lang == 'ar'? EdgeInsets.only(right:10) :EdgeInsets.only(left:10),
+        keyboardType: TextInputType.number,
+        contentPadding: lang == 'ar'? EdgeInsets.only(right:10,top:10) :EdgeInsets.only(left:10),
         isObscure: false,
         hintText: 'semestersu'.tr,
-        hintStyle: TextStyle(fontSize: 16, color: AppColors.inputTextColor),
+        hintStyle: TextStyle( fontSize: lang == 'ar' ? 14 : 16, color: AppColors.inputTextColor),
         hintColor: AppColors.inputTextColor,
         onChanged: (value) {},
         onFieldSubmitted: (value) {},
         textController: semesterController,
         onSaved: (newValue) {},
         validator: (value) {
-          String pattern = r'^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$';
-          RegExp regExp = RegExp(pattern);
-          if (value.length == 0) {
-            return "semesterfield".tr;
-          } 
-          else if(!regExp.hasMatch(value)) {
-            return "semester must be in digits";
-          } else
-            return null;
+          if (value == null || value.isEmpty) {
+            return 'enteringText'.tr;
+          }
+          return null;
         },
         errorText: '',
       ),
@@ -293,55 +284,47 @@ class _SignPageState extends State<StudentSignUp> {
 
   Widget address() {
     return  Container(
-      
       margin:EdgeInsets.only(left:20, right: 20),
       width: Get.width * 0.9,
       child: CustomTextFiled(
         contentPadding: lang == 'ar'? EdgeInsets.only(right:10) :EdgeInsets.only(left:10),
         isObscure: false,
         hintText: 'address'.tr,
-        hintStyle: TextStyle(fontSize: 16, color: AppColors.inputTextColor),
+        hintStyle: TextStyle( fontSize: lang == 'ar' ? 14 : 16, color: AppColors.inputTextColor),
         hintColor: AppColors.inputTextColor,
         onChanged: (value) {},
         onFieldSubmitted: (value) {},
         textController: addressController,
         onSaved: (newValue) {},
         validator: (value) {
-          String patttern = r'(^[a-zA-Z ]*$)';
-          RegExp regExp = RegExp(patttern);
           if (value.length == 0) {
             return "adressField".tr;
-          } else if (!regExp.hasMatch(value)) {
-            return "About must be a-z and A-Z";
           } else
-            return null;
+          return null;
         },
         errorText: '',
       ),
     );
   }
 
-  Widget about() {
+Widget about() {
     return Container(
-      margin: EdgeInsets.only(left: 20, right: 20),
+      // margin: EdgeInsets.only(left: 20, right: 20),
       width: Get.width * 0.9,
       child: CustomTextFiled(
-        contentPadding: lang == 'ar'? EdgeInsets.only(right:10) :EdgeInsets.only(left:10),
+        maxLine: 4,
+        contentPadding: lang == 'ar'? EdgeInsets.only(right:20,top: 20) :EdgeInsets.only(left:20,top: 20),
         isObscure: false,
-        hintText: 'aboutsu'.tr,
-        hintStyle: TextStyle(fontSize: 16, color: AppColors.inputTextColor),
-        hintColor: AppColors.inputTextColor,
+        hintText: 'about'.tr,
+        hintStyle: TextStyle( fontSize: lang == 'ar' ? 14 : 16, color: AppColors.inputTextColor),
+        hintColor:   lang == 'ar'? AppColors.inputTextColor:AppColors.inputTextColor ,
         onChanged: (value) {},
         onFieldSubmitted: (value) {},
         textController: aboutController,
         onSaved: (newValue) {},
         validator: (value) {
-          String patttern = r'(^[a-zA-Z ]*$)';
-          RegExp regExp = RegExp(patttern);
           if (value.length == 0) {
             return "aboutfield".tr;
-          } else if (!regExp.hasMatch(value)) {
-            return "About must be a-z and A-Z";
           } else
             return null;
         },
@@ -351,33 +334,91 @@ class _SignPageState extends State<StudentSignUp> {
   }
 
   Widget degree() {
-    return Container(
-      margin: EdgeInsets.only(left: 20, right: 20),
-      width: Get.width * 0.9,
-      child: CustomTextFiled(
-        contentPadding: lang == 'ar'? EdgeInsets.only(right:10) :EdgeInsets.only(left:10),
-        isObscure: false,
-        hintText: 'degreesu'.tr,
-        hintStyle: TextStyle(fontSize: 16, color: AppColors.inputTextColor),
-        hintColor: AppColors.inputTextColor,
-        onChanged: (value) {},
-        onFieldSubmitted: (value) {},
-        textController: degreeController,
-        onSaved: (newValue) {},
-        validator: (value) {
-          String patttern = r'(^[a-zA-Z ]*$)';
-          RegExp regExp = RegExp(patttern);
-          if (value.length == 0) {
-            return "degreeReq".tr;
-          } else if (!regExp.hasMatch(value)) {
-            return "Degree must be a-z and A-Z";
-          } else
-            return null;
-        },
-        errorText: '',
-      ),
-    );
+     return  Container(
+          margin: EdgeInsets.only(left: 20, right: 20),
+          width: Get.width * 0.9,
+          decoration: BoxDecoration(
+            color: AppColors.inputColor,
+            border: Border.all(color: AppColors.outline),
+            borderRadius: BorderRadius.circular(2.0)
+          ),
+          child: ButtonTheme(
+            alignedDropdown: true,
+            child: DropdownButtonHideUnderline(
+              child: Container(
+                margin: EdgeInsets.only(right:2),
+                child: DropdownButton(
+                  hint: Text(
+                     statusSelected == null? 'degreesu'.tr:statusSelected ,
+                    style: TextStyle( fontSize: lang == 'ar' ? 14 : 16, color: AppColors.inputTextColor)
+                  ),
+                  dropdownColor: AppColors.inPutFieldColor,
+                  icon: Icon(Icons.arrow_drop_down),
+                  items:  <String>['Diploma' ,'Bachelor\'s', 'Master\'s', 'Doctorate'].map((String value){
+                    return DropdownMenuItem(
+                    value: value,
+                    child: Text(
+                      value,
+                      style: TextStyle(color: Colors.grey[800]),
+                    )
+                  );
+                  }).toList(),
+                  onChanged: (val) {
+                    setState(() {
+                      statusSelected = val;
+                    });
+                  },
+                ),
+              )
+            )
+          )
+        );
+      
+    // return Container(
+    //   margin: EdgeInsets.only(left: 20, right: 20),
+    //       width: Get.width * 0.9,
+    //       decoration: BoxDecoration(
+    //         color: AppColors.inputColor,
+    //         border: Border.all(color: AppColors.outline),
+    //         borderRadius: BorderRadius.circular(2.0)
+    //       ),
+    //   child: ButtonTheme(
+    //     alignedDropdown: true,
+    //     child: Container(
+    //       width: Get.width,
+    //       child: DropdownButtonHideUnderline(
+    //         child: DropdownButton(
+    //           hint: Text(
+    //             statusSelected == null? 'degreesu'.tr:statusSelected ,
+    //             style: TextStyle(
+    //               fontSize: 13, color: Colors.grey[800]
+    //             )
+    //           ),
+    //           dropdownColor: AppColors.inPutFieldColor,
+    //           icon: Icon(Icons.arrow_drop_down),
+    //           items: <String>["Diploma', 'Bachelor's, Masrter's, Doctorate "].map((String value) {
+    //             return DropdownMenuItem(
+    //               value: value,
+    //               child: Text(
+    //                 value,
+    //                 style: TextStyle(color: Colors.grey[800]),
+    //               )
+    //             );
+    //           }).toList(),
+    //           onChanged: (value) {
+    //             setState(() {
+    //               statusSelected = value;
+                 
+    //             });
+    //           },
+    //         )
+    //       ),
+    //     )
+    //   )
+    // );
+    
   }
+  
 
   Widget eMail() {
     return Container(
@@ -387,21 +428,20 @@ class _SignPageState extends State<StudentSignUp> {
         contentPadding: lang == 'ar'? EdgeInsets.only(right:10) :EdgeInsets.only(left:10),
         isObscure: false,
         hintText: 'emails'.tr,
-        hintStyle: TextStyle(fontSize: 16, color: AppColors.inputTextColor),
+        hintStyle: TextStyle( fontSize: lang == 'ar' ? 14 : 16, color: AppColors.inputTextColor),
         hintColor: AppColors.inputTextColor,
         onChanged: (value) {},
         onSaved: (newValue) {},
         onFieldSubmitted: (value) {},
         textController: emailController,
         validator: (val) {
-          String pattern =
-              r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+          String pattern = r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
           RegExp regExp = RegExp(pattern);
           if ( val.length == 0 ){
             return 'enterEmail'.tr;
           }
           else if (!regExp.hasMatch(val)) {
-            return "Enter Valid Email Address";
+            return "email_Valid".tr;
           }
           return null;
         },
@@ -409,9 +449,119 @@ class _SignPageState extends State<StudentSignUp> {
       ),
     );
   }
-
-  Widget mobile() {
+  Widget password() {
     return Container(
+      margin: EdgeInsets.only(left: 20, right: 20),
+      width: Get.width * 0.9,
+      child: TextFormField(
+        decoration: InputDecoration(
+           contentPadding: lang == 'ar'? EdgeInsets.only(right:10) :EdgeInsets.only(left:10),         
+            hintText: 'password'.tr,            
+            hintStyle: TextStyle( fontSize: lang == 'ar' ? 14 : 16, color: AppColors.inputTextColor),  
+            //  suffixIcon: IconButton(
+            //   icon: Icon(
+            //     isvisible ? Icons.visibility_off : Icons.visibility,
+            //     color: Theme.of(context).primaryColor),
+            //   onPressed: () {
+            //     setState(() {
+            //       isvisible = !isvisible;
+            //     });
+            //   },
+              
+            // ),  
+            fillColor: AppColors.inputColor,
+            filled: true,
+            border: InputBorder.none,
+            errorBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.red),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.red),
+            ),
+            enabledBorder: OutlineInputBorder(
+              //borderRadius: BorderRadius.circular(20.0),
+
+              borderSide: BorderSide(color: AppColors.outline),
+            ),       
+         ),
+         
+          obscureText : true,
+          onChanged: (value) {
+          passwordValue = value;
+        },
+        onSaved: (newValue) {},
+        onFieldSubmitted: (value) {},
+        controller: passController,
+        validator: (val) {
+          if ( val!.length == 0 ){
+            return 'EnterPassword'.tr;
+          }else if(val != confirmPasswordValue) {
+            return 'passwordNotMatch'.tr;
+          }
+          return null;
+        },
+        // errorText: '',
+      ),
+    );
+  }
+     Widget confirmPassword() {
+    return Container(
+      margin: EdgeInsets.only(left: 20, right: 20),
+      width: Get.width * 0.9,
+      child: TextFormField(
+        decoration: InputDecoration(
+           contentPadding: lang == 'ar'? EdgeInsets.only(right:10) :EdgeInsets.only(left:10),
+          
+          hintText: 'confirmPassword'.tr,
+          hintStyle: TextStyle( fontSize: lang == 'ar' ? 14 : 16, color: AppColors.inputTextColor),
+          // hintColor: AppColors.inputTextColor,
+          //  suffixIcon: IconButton(
+          //     icon: Icon(
+          //         passwordVisible ? Icons.visibility_off : Icons.visibility,
+          //         color: Theme.of(context).primaryColor),
+          //     onPressed: () {
+          //       setState(() {
+          //         passwordVisible = !passwordVisible;
+          //       });
+          //     },
+          //   ),
+            fillColor: AppColors.inputColor,
+            filled: true,
+            border: InputBorder.none,
+            errorBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.red),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.red),
+            ),
+            enabledBorder: OutlineInputBorder(
+              //borderRadius: BorderRadius.circular(20.0),
+
+              borderSide: BorderSide(color: AppColors.outline),
+            ),
+          ),
+          obscureText:true,
+          onChanged: (value) {
+          confirmPasswordValue = value;
+        },
+       
+        onSaved: (newValue) {},
+        onFieldSubmitted: (value) {},
+        controller: conPassController,
+        validator: (val) {
+          if ( val!.length == 0 ){
+            return 'EnterPasswordConfirm'.tr;
+          }else if(val != passwordValue) {
+            return 'passwordNotMatch'.tr;
+          }
+          return null;
+        },
+        // errorText: '',
+      ),
+    );
+  }
+  Widget mobile() {
+    return  Container(
       width: Get.width / 1.1,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(5),
@@ -420,8 +570,11 @@ class _SignPageState extends State<StudentSignUp> {
       ),
       padding: EdgeInsets.symmetric(horizontal: 10),
       child: InternationalPhoneNumberInput(
+        focusNode: FocusNode(),
+        cursorColor: AppColors.appBarBackGroundColor,
+        autoFocus: false,
         inputDecoration: InputDecoration(
-          contentPadding: EdgeInsets.only(left:10,bottom:10),
+          contentPadding: EdgeInsets.only(left:10,bottom: 10),
           fillColor: AppColors.inputColor,
           filled: true,
           border: InputBorder.none,
@@ -432,23 +585,21 @@ class _SignPageState extends State<StudentSignUp> {
             borderSide: BorderSide(color: Colors.red),
           ),
           hintText: "mobilee".tr,
-          hintStyle: TextStyle(fontSize: 16, color: AppColors.inputTextColor),
+          hintStyle: TextStyle( fontSize: lang == 'ar' ? 14 : 16, color: AppColors.inputTextColor),
         ),
-        onInputChanged: (PhoneNumber number) {
+        onInputChanged: (PhoneNumber numberr) {
+          print("..,.,,/././/.//././.$numberr");
+          number = numberr;
         },
-        onInputValidated: (bool value) {
-        },
+        onInputValidated: (bool value) {},
         selectorConfig: SelectorConfig(
           selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
         ),
         ignoreBlank: false,
-        autoValidateMode: AutovalidateMode.disabled,
+        autoValidateMode: AutovalidateMode.onUserInteraction,
         selectorTextStyle: TextStyle(color: Colors.black),
-        // initialValue: n,
         textFieldController: mobileController,
-        formatInput: false,
-        keyboardType:
-            TextInputType.numberWithOptions(signed: true, decimal: true),
+        formatInput: true,
         inputBorder: OutlineInputBorder(),
         onSaved: (PhoneNumber number) {
         },
@@ -457,76 +608,82 @@ class _SignPageState extends State<StudentSignUp> {
     );
   }
 
-  var finalDate;
-  Widget studentdob() {
-    // return  Container(
-    //   margin:EdgeInsets.only(left:20, right: 20),
-    //   width: Get.width * 0.9,
-    //   child: CustomTextFiled(
-    //     isObscure: false,
-    //     hintText: "yymmdd".tr,
-    //     hintStyle: TextStyle(fontSize: 13, color: AppColors.inputTextColor),
-    //     hintColor: AppColors.inputTextColor,
-    //     onChanged: (value) {  },
-    //     onFieldSubmitted: (value) {},
-    //     textController: dobController,
-    //     onSaved: (String? newValue) {
-    //     },
-    //     validator: (value) {
-    //     String pattern = (r'^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$');
-    //     RegExp regExp = RegExp(pattern);
-    //       if (value.length == 0) {
-    //         return 'Please enter your birthday';
-    //         } else if (!regExp.hasMatch(value)) {
-    //         return 'Please enter a valid birthday format is yyyy-mm-dd';
-    //         }
-    //         return null;
-    //       },
 
-    //     errorText: '',
-    //   ),
-    // );
-        return Container(
-          height: 50,
-          padding: const EdgeInsets.symmetric(vertical:1.0,horizontal: 10),
-          margin: EdgeInsets.only(left: 20,right: 20,bottom: 10),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            border: Border.all(color: AppColors.outline)
-          ),
-          child:   GestureDetector(
-          onTap: () {
-          showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime(1900),
-                  lastDate: DateTime.now())
-              .then((date) {
-            setState(() {
-              dateTime = date;
-              finalDate = DateFormat('yyyy-MM-dd').format(dateTime!);
-            });
-          });
+
+  Widget studentdob() {
+    return Container(
+      height: 50,
+      padding: const EdgeInsets.symmetric(vertical:1.0,horizontal: 10),
+      margin: EdgeInsets.only(left: 20,right: 20,bottom: 10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(5),
+        border: Border.all(color: AppColors.outline)
+      ),
+      child: GestureDetector(
+        onTap: () {
+          DatePicker.showDatePicker(context,
+            showTitleActions: true,
+            minTime: DateTime(1900, 3, 5),
+            maxTime: DateTime.now(),
+            theme: DatePickerTheme(
+              headerColor:AppColors.appBarBackGroundColor,
+              backgroundColor: Colors.white,
+              itemStyle: TextStyle(
+                color: AppColors.appBarBackGroundColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 18
+              ),
+              doneStyle: TextStyle(color:Colors.white,  fontSize: lang == 'ar' ? 14 : 16,),
+              // cancelStyle: TextStyle(color:Colors.white,  fontSize: lang == 'ar' ? 14 : 16,),
+            ),
+            onChanged: (date) {
+            }, 
+            onConfirm: (date) {
+              setState(() {
+                dateTime = date;
+                  finalDate = DateFormat('yyyy-MM-dd').format(dateTime!);
+                
+              });
+              
+            },    
+            currentTime: DateTime.now(), locale: LocaleType.en
+          );
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Container(
-              child: Text(dateTime == null ? 'date_of_birth'.tr : dateFormate ,textAlign: TextAlign.left, style: TextStyle(color: Colors.grey[500],fontSize: 16))),
+              child:  Text(finalDate == null ? 'date_of_birth'.tr : finalDate.toString() ,textAlign: TextAlign.left, style: TextStyle(color: Colors.grey[500], fontSize: lang == 'ar' ? 14 : 16,))),
             GestureDetector(
               child: Icon(Icons.calendar_today,color: Colors.grey,),
-              onTap: () {               
-                showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime(1900),
-                        lastDate: DateTime.now())
-                    .then((date) {
-                  setState(() {
-                    dateTime = date;
-                    finalDate = DateFormat('yyyy-MM-dd').format(dateTime!);
-                  });
-                });
+               onTap: () {               
+                DatePicker.showDatePicker(context,
+                  showTitleActions: true,
+                  minTime: DateTime(1900, 3, 5),
+                  maxTime: DateTime.now(),
+                  theme: DatePickerTheme(
+                    headerColor:AppColors.appBarBackGroundColor,
+                    backgroundColor: Colors.white,
+                    itemStyle: TextStyle(
+                      color: AppColors.appBarBackGroundColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18
+                    ),
+                    doneStyle: TextStyle(color:Colors.white, fontSize: lang == 'ar' ? 14 : 16,),
+                    cancelStyle: TextStyle(color:AppColors.appBarBackGroundColor,  fontSize: lang == 'ar' ? 14 : 16,),
+                  ),
+                  onChanged: (date) {
+                  }, 
+                  onConfirm: (date) {
+                    setState(() {
+                      dateTime = date;
+                       finalDate = DateFormat('yyyy-MM-dd').format(dateTime!);
+                      
+                    });
+                    
+                  },    
+                  currentTime: DateTime.now(), locale: LocaleType.en
+                );
               },
             ),
           ],
@@ -637,7 +794,8 @@ class _SignPageState extends State<StudentSignUp> {
             dropdownColor: AppColors.inputColor,
             icon: Icon(Icons.arrow_drop_down),
             items: citydata.map((citt) {
-              return DropdownMenuItem(value: citt, child: Text(citt['city']));
+              return DropdownMenuItem(value: citt, child: Text(
+                citt['city']));
             }).toList(),
             onChanged: (value) {
               setState(() {
@@ -666,7 +824,7 @@ class _SignPageState extends State<StudentSignUp> {
         alignedDropdown: true,
         child: DropdownButtonHideUnderline(
           child: DropdownButton(
-            hint:Text(hintUniText !=null ? hintUniText: "universitysu".tr,style: TextStyle(fontSize: 16, color: AppColors.inputTextColor)),
+            hint:Text(hintUniText !=null ? hintUniText: "universitysu".tr,style: TextStyle(fontSize: lang == 'ar' ? 14 : 16, color: AppColors.inputTextColor)),
             dropdownColor: AppColors.inPutFieldColor,
             icon: Icon(Icons.arrow_drop_down),
             items: daattta.map((uni) {
@@ -678,8 +836,10 @@ class _SignPageState extends State<StudentSignUp> {
             onChanged: (dataa) {
               setState(() {
                 mapuni = dataa as Map;
+                print("mappping MAP VALUEEEEEE................................$mapuni");
                 hintUniText =  mapuni['name'];
-                selectedUniversity = dataa['id'];
+                selectedUniversity = mapuni['id'];
+                print("uselectedUniversity ID.................$selectedUniversity");
               });
             },
           )
@@ -701,7 +861,7 @@ class _SignPageState extends State<StudentSignUp> {
         alignedDropdown: true,
         child: DropdownButtonHideUnderline(
           child: DropdownButton(
-            hint: Text(hintClgText !=null ? hintClgText: "collegesu".tr, style: TextStyle(fontSize: 16, color: AppColors.inputTextColor)),
+            hint: Text(hintClgText !=null ? hintClgText: "collegesu".tr, style: TextStyle(fontSize: lang == 'ar' ? 14 : 16, color: AppColors.inputTextColor)),
             dropdownColor: AppColors.inPutFieldColor,
             icon: Icon(Icons.arrow_drop_down),
             items: collegeData.map((coll) {
@@ -711,6 +871,7 @@ class _SignPageState extends State<StudentSignUp> {
               );
             }).toList(),
             onChanged: (value) {
+              print("abdhjsgadgdhdgfsA VALUE PRINTED.....$value");
               setState(() {
                 mapClgSleceted = value as Map;
                 hintClgText = mapClgSleceted['college'];

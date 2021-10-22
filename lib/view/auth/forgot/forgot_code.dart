@@ -86,11 +86,8 @@ class _ForgotCodeState extends State<ForgotCode> {
       child: Container(
         width: 60,
         child: TextFormField(
-          
           focusNode: focusNode,
-          validator: (value) {
-           
-          } ,
+          validator: (value) {},
           controller: controller,
           obscureText: true,
           keyboardType: TextInputType.number,
@@ -98,7 +95,6 @@ class _ForgotCodeState extends State<ForgotCode> {
           textAlign: TextAlign.center,
           decoration: otpInputDecoration,
           onChanged: onchange
-          
         ),
       ),
     );
@@ -122,7 +118,7 @@ class _ForgotCodeState extends State<ForgotCode> {
                     },),
               otpTextfield(_controller4,pin4node,(value){
                       pin4node!.unfocus();
-                    },)
+                },)
             ],
           )
         ),

@@ -12,12 +12,10 @@ class MyAddsAdedController extends GetxController {
   void onInit(){
     isLoading = true;
     addesMyListFv();
-    myMyAdd = [];
     super.onInit();
   }
 
   addesMyListFv() async{
-    myMyAdd = [];
     isLoading = true;
     await addsFvrtMyAdds().then((value) {
       addsGet= jsonDecode(value.body);

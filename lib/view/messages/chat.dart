@@ -11,6 +11,8 @@ import 'package:success_stations/view/messages/inbox.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:socket_io_client/socket_io_client.dart';
 
+import '../shimmer.dart';
+
 class ChattingPage extends StatefulWidget {
   _ChattingState createState() => _ChattingState();
 }
@@ -103,8 +105,7 @@ class _ChattingState extends State<ChattingPage> {
                 }
                 return Column(
                   children: [
-                    val.isLoading == false && val.chat != null? messageList(val.chat['data']['messages']):Container(
-                    )
+                    val.isLoading == false && val.chat != null? messageList(val.chat['data']['messages']):shimmer()
                   ],
                 );
                 
@@ -125,7 +126,6 @@ class _ChattingState extends State<ChattingPage> {
           Align(
             alignment: Alignment.bottomLeft,
             child: Container(
-              
               padding: EdgeInsets.only(left: 10,bottom: 10,top: 10),
               height: 60,
               width: double.infinity,
@@ -199,10 +199,7 @@ class _ChattingState extends State<ChattingPage> {
             child: NotificationListener<ScrollNotification>(
               onNotification: (ScrollNotification scrollInfo) {
                 if (!isLoading && scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
-                  // // setState(() {
                     isLoading = true;
-                  // // });
-                  print(".........-------------$data");
                   _loadData(data['next_page_url']);
                 }
                   return false;

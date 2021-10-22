@@ -7,6 +7,8 @@ import 'package:success_stations/styling/button.dart';
 import 'package:success_stations/styling/colors.dart';
 import 'package:success_stations/styling/get_size.dart';
 
+import '../shimmer.dart';
+
 class AdvertisePage extends StatefulWidget {
   AdvertiseStatePage createState() => AdvertiseStatePage();
 }
@@ -26,12 +28,12 @@ class AdvertiseStatePage extends State<AdvertisePage> {
    writeController.clear();
  
   }
-   void dispose() {
-    pin2node!.dispose();
-    pin3node!.dispose();
-    pin4node!.dispose();
-    super.dispose();
-  }
+  //  void dispose() {
+  //   pin2node!.dispose();
+  //   pin3node!.dispose();
+  //   pin4node!.dispose();
+  //   super.dispose();
+  // }
   final formKey = new GlobalKey<FormState>();
   var json;
   mydata(){
@@ -54,7 +56,11 @@ class AdvertiseStatePage extends State<AdvertisePage> {
     final space10 = SizedBox(height: getSize(10, context));
     
     return Scaffold(
-      appBar:AppBar(centerTitle: true,title: Text('advertise_with_us'.tr),backgroundColor: AppColors.appBarBackGroundColor),
+      appBar:AppBar(
+        leading: GestureDetector(
+          onTap: (){Get.back();},
+          child: Icon(Icons.arrow_back)),
+        centerTitle: true,title: Text('advertise_with_us'.tr),backgroundColor: AppColors.appBarBackGroundColor),
       body: SingleChildScrollView(
         child: Form(
           key: formKey,
@@ -63,7 +69,7 @@ class AdvertiseStatePage extends State<AdvertisePage> {
               GetBuilder<ContentManagmentController>( 
           init: ContentManagmentController(),
           builder:(val) {
-            return val.aboutData != null  ? text(val.aboutData['data']) : Center(child: CircularProgressIndicator());
+            return val.aboutData != null  ? text(val.aboutData['data']) : shimmer4();
     
           }   
      ),
@@ -111,7 +117,7 @@ class AdvertiseStatePage extends State<AdvertisePage> {
         decoration:InputDecoration( 
           focusedBorder: OutlineInputBorder(
            borderSide: BorderSide(color: AppColors.appBarBackGroundColor)),
-          contentPadding: EdgeInsets.only(left:15,top: 15,bottom: 15,right: 15),
+          contentPadding: EdgeInsets.only(left:10,top: 10,bottom: 10,right: 10),
           hintText: "nameph".tr,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(5.0),
@@ -161,7 +167,7 @@ class AdvertiseStatePage extends State<AdvertisePage> {
       decoration:InputDecoration( 
         focusedBorder: OutlineInputBorder(
            borderSide: BorderSide(color: AppColors.appBarBackGroundColor)),
-          contentPadding: EdgeInsets.only(left:15,top: 15,bottom: 15,right: 15),
+       contentPadding: EdgeInsets.only(left:10,top: 10,bottom: 10,right: 10),
         hintText: "phone".tr,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(5.0),

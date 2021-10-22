@@ -13,9 +13,11 @@ class  AdDeletingController extends GetxController {
    adDelete(dataa) async {
      isLoading(true);
      await adDeleting(dataa).then((res) {    
-      var data = jsonDecode(res.body);
+      var data = jsonDecode(res.body);  
+      print(res.statusCode);
+      print(data);
       if(res.statusCode == 200 || res.statusCode < 400){
-        
+      
         Get.snackbar("Ad successfully deleted",'',backgroundColor: AppColors.appBarBackGroundColor);
         isLoading(false);      
       } if(res.statusCode >=  400){

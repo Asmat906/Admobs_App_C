@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:success_stations/controller/last_location_controller.dart';
 import 'package:success_stations/controller/location_controller.dart';
 import 'package:success_stations/styling/colors.dart';
 import 'package:success_stations/styling/images.dart';
 import 'package:success_stations/styling/text_style.dart';
+
+import '../shimmer.dart';
 
 class LocationTab extends StatefulWidget {
   const LocationTab({ Key? key }) : super(key: key);
@@ -52,32 +51,28 @@ class _LocationTabState extends State<LocationTab> {
     // });
   }
   @override
-  Widget build(BuildContext context) {
-   
+  Widget build(BuildContext context) { 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      body: ListView(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            filter(),
-             GetBuilder<LocationController>( // specify type as Controller
-                  init: LocationController(), // intialize with the Controller
-                  builder: (value){ 
-                    return value.isLoading == true ? Center(child: CircularProgressIndicator()):
-                    value.lastLocation !=null &&   value.lastLocation['success']== true ?
-                     locationList(value.lastLocation['data'])
-                     :lastLoc.resultInvalid.isTrue && value.lastLocation['success'] == false?
-                     Container(
-                       child:Text(lastLoc.lastLocation['errors'])):Container();
-                    
-                  }
-                    ),
-           
-          ],
-          ),
-        ],
+        filter(),
+         GetBuilder<LocationController>( // specify type as Controller
+              init: LocationController(), // intialize with the Controller
+              builder: (value){ 
+                return value.isLoading == true ? friendReqShimmer():
+                value.lastLocation !=null &&   value.lastLocation['success']== true ?
+                 locationList(value.lastLocation['data'])
+                 :lastLoc.resultInvalid.isTrue && value.lastLocation['success'] == false?
+                 Container(
+                   child:Text(lastLoc.lastLocation['errors'])
+                 ):Container();
+                
+              }
+        ),
+       
+      ],
       ),
     );
   }
@@ -364,16 +359,17 @@ Widget locationList(lastLocation) {
       ),
     ):
      Container(
-      height: Get.height,
+      height: Get.height/1.6,
+      margin: EdgeInsets.only(bottom: 35),
       child: ListView.builder(
-        physics: NeverScrollableScrollPhysics(),
+        // physics: NeverScrollableScrollPhysics(),
         itemCount: lastLocation['data'].length,
+        shrinkWrap: true,
         // ignore: non_constant_identifier_names
         itemBuilder: (BuildContext,index) {
         
           return Card(
             child: Container(
-              height: 100,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -382,26 +378,23 @@ Widget locationList(lastLocation) {
                       Center(
                         child: Container(
                           color: Colors.grey[100],
-                          width: Get.width/4,
+                          width: Get.width/3.6,
                           child: Padding(
                             padding:
                             const EdgeInsets.all(10.0),
                             child: GestureDetector(
-                              child: 
-                              
-                               lastLocation['data'][index]['user_name'] !=null && lastLocation['data'][index]['user_name']['image'] !=null&&  lastLocation['data'][index]['user_name']['image']['url']!= null ?
-                  ClipRRect(
-                   borderRadius: BorderRadius.only(topLeft: Radius.circular(20.0),topRight: Radius.circular(20.0)),
-                    child: Container(
-                      // width: Get.width/200,
-                      height: Get.height/7.5,
-                      child: lastLocation['data'][index]['user_name']['image']['url'] !=null ?
-                    Image.network(lastLocation['data'][index]['user_name']['image']['url'], fit: BoxFit.cover,): Container()
-                    ),
-                  ): Container(
-                      child: Image.asset(AppImages.location,height: 117,),
-                  ),
-                            ),
+                              child:lastLocation['data'][index]['image'] !=null&&  lastLocation['data'][index]['image']['url']!= null ?
+                              ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                                child: Container(
+                                  height: Get.height/7.5,
+                                  child: lastLocation['data'][index]['image']['url'] !=null ?
+                                  Image.network(lastLocation['data'][index]['image']['url'], fit: BoxFit.cover,): Container()
+                                ),
+                              ): Container(
+                                  child: Image.asset(AppImages.location,height: 117,),
+                              ),
+                                        ),
                           )
                         ),
                       ),
@@ -428,49 +421,51 @@ Widget locationList(lastLocation) {
                                   ),
                                )
                               : Container(),
-                              
+                               SizedBox(height: 4),
                             Row(
                               children: [
-                                Text("Service: ",style: TextStyle(fontSize:14,color:AppColors.appBarBackGroundColor)),
+                                Text("services".tr,style: TextStyle(fontSize:14,color:AppColors.appBarBackGroundColor)),
                                 lastLocation['data'][index]['services'] !=null ?
-                              Text(lastLocation['data'][index]['services']['servics_name'],
+                              Text(": ${lastLocation['data'][index]['services']['servics_name']}",
                               style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 12),
                               ): Container(),
                               SizedBox(width: 3,),
                              
                               ],
                             ),
-                            SizedBox(height: 8),
-                              
+                            SizedBox(height: 4),
+                               lastLocation['data'][index]['country_name']!= null ? 
+                          Row(
+                            children: [
+                              Container(
+                                child: Text(
+                                  "country".tr,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight:FontWeight.bold
+                                    ,fontSize: 12
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                width: Get.width / 3.3,
+                                child: Text(
+                                  " ${lastLocation['data'][index]['country_name']}",
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 12
+                                  ),
+                                ),
+                              )
+                            ],
+                          ): Container()
                           ],
                         ),
                       ),
                     ],
                   ),
                   SizedBox(height:20),
-                 
-                  
-                  // Column(
-                  //   children: [
-                  //     Padding(
-                  //       padding: const EdgeInsets.all(10.0),
-                  //       child: 
-                  //       CircleAvatar(
-                  //         backgroundColor: Colors.grey[200],
-                  //         child: Icon(Icons.person)
-                  //         ) 
-                  //     ),
-                  //     Row(
-                  //       children: [
-                  //         Container(
-                  //           padding: EdgeInsets.only(right:5),
-                  //           child: Image.asset(AppImages.blueHeart, height: 20)
-                  //         ),
-                  //         Image.asset(AppImages.call, height: 20),
-                  //       ],
-                  //     )
-                  //   ],
-                  // ),
+                
                 ],
               ),
             ),

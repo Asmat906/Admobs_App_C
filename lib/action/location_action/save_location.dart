@@ -28,7 +28,7 @@ Future<http.Response> deleteLocation(id) async{
 } 
 Future<http.Response> getMyLocation(id) async{
   final Config conf = Config();
-  var url = Uri.parse("${conf.baseUrl}locations/$id");
+  var url = Uri.parse("${conf.baseUrl}user-location/$id");
   final result = await http.get(
     url,headers: ApiHeaders().headersWithToken);
     return result;
@@ -67,9 +67,11 @@ Future<http.Response> getCityLocation(city,id) async{
     return result;
 }
 
-Future<http.Response> getAllCityLocation(city) async{
+Future<http.Response> getAllCityLocation(city,nameS) async{
   final Config conf = Config();
-  var url = Uri.parse("${conf.baseUrl}locations?$city");
+  var url = city != null && nameS != null ?  Uri.parse("${conf.baseUrl}locations?$city$nameS"):
+   city == null && nameS != null ? Uri.parse("${conf.baseUrl}locations?$nameS") : Uri.parse("${conf.baseUrl}locations?$city");
+    print(url);
   final result = await http.get(
     url,headers: ApiHeaders().headersWithToken);
     return result;

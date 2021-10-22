@@ -1,7 +1,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:success_stations/controller/offers/my_offer_controller.dart';
 import 'package:success_stations/styling/app_bar.dart';
 import 'package:success_stations/styling/colors.dart';
 import 'package:success_stations/styling/get_size.dart';
@@ -14,7 +13,6 @@ class HomeAllOfferDEtailPage extends StatefulWidget {
 
 class _HomeAllOfferDEtailPageState extends State<HomeAllOfferDEtailPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final putData = Get.put(MyOffersDrawerController());
 
   var homeCategoryById;
   var lang;
@@ -32,54 +30,57 @@ class _HomeAllOfferDEtailPageState extends State<HomeAllOfferDEtailPage> {
     final space10 = SizedBox(height: getSize(10, context));
     return Scaffold(
       key: _scaffoldKey,
-      // appBar: PreferredSize(
-      //   preferredSize: Size.fromHeight(70.0),
-      //   child: appbar(_scaffoldKey, context, AppImages.appBarLogo,
-      //       AppImages.appBarSearch, 1),
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(70.0),
+        preferredSize: Size.fromHeight(60.0),
         child: AppBar(
+          leading: GestureDetector(
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: () => Get.back(),
+                  child: Container(
+                    margin: EdgeInsets.only(left:10, top:5),
+                    child: Icon(Icons.arrow_back,
+                      color: Colors.white, size: 25
+                    ),
+                  ),
+                ),
+              ],
+            )
+          ),
           title: Image.asset(
             AppImages.appBarLogo,
             height: 40,
           ),
-          leading: GestureDetector(
-              onTap: () {
-                Get.back();
-              },
-              child: Icon(Icons.arrow_back_ios_outlined)),
-          backgroundColor: AppColors.appBarBackGroundColor,
-          centerTitle: true,
+            backgroundColor: AppColors.appBarBackGroundColor,
+            centerTitle: true,
         ),
       ),
 
       drawer: Theme(
-        data: Theme.of(context).copyWith(
-            // canvasColor: AppColors.botomTiles
-            ),
+        data: Theme.of(context).copyWith( ),
         child: AppDrawer(),
       ),
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(height: 20),
+            // SizedBox(height: 20),
             Container(
-                child: Column(
-              children: [
-                Container(
-                    width: Get.width / 1.1,
-                    child: homeCategoryById != null &&
-                            homeCategoryById['image'] != null &&
-                            homeCategoryById['image']['url'] != null
-                        ? Image.network(homeCategoryById['image']['url'],
-                            height: Get.height / 2, fit: BoxFit.fitHeight)
-                        : Container(
-                            child: Icon(
-                              Icons.image,
-                              size: 50,
-                            ),
-                          )),
+              child: Column(
+                children: [
+                  Container(
+                    child: homeCategoryById != null && homeCategoryById['image'] != null && homeCategoryById['image']['url'] != null
+                      ? Image.network(homeCategoryById['image']['url'],
+                        height: Get.height / 2, fit: BoxFit.fitHeight
+                      )
+                      : Container(
+                        child: Icon(
+                          Icons.image,
+                          size: 50,
+                        ),
+                      )
+                    ),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -87,14 +88,13 @@ class _HomeAllOfferDEtailPageState extends State<HomeAllOfferDEtailPage> {
                       height: Get.height / 3.3,
                       child: Card(
                         elevation: 2.0,
-                        margin: EdgeInsets.only(left: 20, right: 20),
+                        // margin: EdgeInsets.only(left: 20, right: 20),
                         child: Column(
                           children: [
                             Container(
                                 width: MediaQuery.of(context).size.width / 1,
                                 color: AppColors.appBarBackGroundColor,
-                                padding: EdgeInsets.only(
-                                        top: 10, bottom: 15, right: 25,left: 20),
+                                padding: EdgeInsets.only( top: 10, bottom: 15, right: 25,left: 20),
                                 child: homeCategoryById != null &&
                                         homeCategoryById['url'] != null
                                     ? Row(
@@ -110,7 +110,7 @@ class _HomeAllOfferDEtailPageState extends State<HomeAllOfferDEtailPage> {
                                               margin:
                                                   EdgeInsets.only(right: 10),
                                               child: Icon(
-                                                Icons.arrow_forward_ios,
+                                                Icons.arrow_forward,
                                                 color: Colors.white,
                                               ))
                                         ],
@@ -136,8 +136,7 @@ class _HomeAllOfferDEtailPageState extends State<HomeAllOfferDEtailPage> {
                                         homeCategoryById['description']['en'],
                                         style: TextStyle(
                                             color: Colors.black, fontSize: 14),
-                                      )
-                                    : Container()),
+                                      ) : Container()),
                           ],
                         ),
                       ),

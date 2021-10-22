@@ -4,7 +4,8 @@ import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:success_stations/controller/user_drafted_controller.dart';
 import 'package:success_stations/styling/colors.dart';
-import 'package:success_stations/view/bottom_bar.dart';
+
+import '../../shimmer.dart';
 
 class DraftAds extends StatefulWidget {
   const DraftAds({ Key? key }) : super(key: key);
@@ -33,25 +34,35 @@ class _DraftAdsState extends State<DraftAds> {
         backgroundColor: AppColors.appBarBackGroundColor,
         leading: IconButton(
           onPressed: () {
-            Get.off(BottomTabs());
+            Get.back();
           },
           icon:
-          Icon(Icons.arrow_back_ios_new)
+          Icon(Icons.arrow_back)
         ),
       ),
-        body: GetBuilder<DraftAdsController>( // specify type as Controller
-          init: DraftAdsController(), // 
-          builder: (value) { 
-           return value.isLoading == true ?  Center(child: CircularProgressIndicator()): value.userData['success'] == true ? draftedlist(value.userData['data']) : value.userData['success'] == false ? Container(
-             child: Center(child: Text(value.userData['errors'],style: TextStyle(fontWeight: FontWeight.bold),)),
-           ) : Center(child: CircularProgressIndicator());
-           }
-          )
-        );
+      body: GetBuilder<DraftAdsController>( // specify type as Controller
+        init: DraftAdsController(), // 
+        builder: (value) { 
+          return value.userData !=null &&  value.userData['data'] !=null && value.userData['success']  == true ? 
+          draftedlist(value.userData['data']): getData.resultInvalid.isTrue && value.userData['success'] == false ? 
+          Container(
+            margin: EdgeInsets.only(top: Get.height / 3),
+            child: Center(
+              child: Text(
+                getData.userData['errors'],
+                style: TextStyle( fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ) : shimmer();
+        }
+      )
+    );
   }
 
 Widget draftedlist(allDataAdds){
-    return ListView.builder(
+    return 
+     allDataAdds.length == 0 ? Center(child: Text("NoAdsYet".tr,style: TextStyle(fontSize: 20),)) :
+    ListView.builder(
       itemCount: allDataAdds.length,
       itemBuilder: (BuildContext context, index) {
         return GestureDetector(
@@ -98,13 +109,16 @@ Widget draftedlist(allDataAdds){
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
-                                child: Text(
-                                  allDataAdds[index]['title'][lang].toString(),
+                                width: Get.width/4,
+                                child: 
+                                Text(
+                                  allDataAdds[index]['title'][lang] != null  ?
+                                  allDataAdds[index]['title'][lang]: allDataAdds[index]['title'][lang] == null ? allDataAdds[index]['title']['en']: '',
+                                  overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontWeight: FontWeight.bold),
-                                ),
-                              ),
+                              ),),
                              
                               Expanded(
                                 flex: 2,
@@ -134,7 +148,7 @@ Widget draftedlist(allDataAdds){
                         getData.getDraftedAdsOublished(allDataAdds[index]['id']);
                       },
                       child: Container(
-                        margin: EdgeInsets.only(right: 10),
+                        margin: EdgeInsets.only(right: 10,left: 10),
                         color : AppColors.appBarBackGroundColor,
                         height: 30,
                         width: Get.width/4,

@@ -2,7 +2,6 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:success_stations/controller/sign_in_controller.dart';
-import 'package:success_stations/view/auth/sign_up/student_sign_up.dart';
 
 class GoogleSignInC {
   GetStorage dataStore = GetStorage();
@@ -17,7 +16,6 @@ class GoogleSignInC {
    
   singIn() {
     googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount? account) {
-
       currentUser = account;
       // if (_currentUser != null) {
       //   _handleGetContact(_currentUser!);
@@ -35,6 +33,7 @@ class GoogleSignInC {
            'name' : value.displayName,
            'provider_id' : value.id
         };
+        print("..//.//./...------------");
         login.loginSocial(json);
         value.authentication.then((googleKey){
               if(googleKey.accessToken != null) {

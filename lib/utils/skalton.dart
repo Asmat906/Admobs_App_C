@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:success_stations/styling/colors.dart';
 
-Widget shimmer() {
+Widget shimmerB() {
     bool _enabled = true;
     return  Expanded(
        child:  Shimmer.fromColors(
@@ -56,7 +56,7 @@ Widget shimmer() {
     );  
   }
 
-   Widget viewCardLoading(context) {
+  Widget viewCardLoading(context) {
     bool _enabled = true;
     return  Expanded(
       child:  Shimmer.fromColors(

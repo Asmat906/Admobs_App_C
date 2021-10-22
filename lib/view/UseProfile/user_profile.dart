@@ -4,25 +4,22 @@ import 'package:get_storage/get_storage.dart';
 import 'package:success_stations/controller/banner_controller.dart';
 import 'package:success_stations/controller/user_profile_controller.dart';
 import 'package:success_stations/styling/images.dart';
-import 'package:success_stations/view/bottom_bar.dart';
-
+import 'package:success_stations/view/shimmer.dart';
 class UserProfile extends StatefulWidget {
   _UserProfileState createState() => _UserProfileState();
 }
 class _UserProfileState extends State<UserProfile> with AutomaticKeepAliveClientMixin<UserProfile> {
+  
+  var lang,userimage,id;
+  bool liked = false;
   final dataUser = Get.put(UserProfileController());
   final banner = Get.put(BannerController());
-  bool liked = false;
-   GetStorage box = GetStorage();
-   var lang;
-  var userimage;
-  var id ;
+  GetStorage box = GetStorage();
   @override
   void initState() {
     super.initState();
     lang = box.read('lang_code');
     userimage = box.read('user_image');
-   
   }
   @override
   bool get wantKeepAlive => true;
@@ -39,18 +36,20 @@ class _UserProfileState extends State<UserProfile> with AutomaticKeepAliveClient
              profileDetail(val.userData['data']),
              general(val.userData['data'])
             ],
-          ):Center(child: CircularProgressIndicator());
-
+          ): Padding(
+            padding: const EdgeInsets.only(top:30.0),
+            child: friendProfileShimmer(),
+          );
+          
         }
-          ),
-    );}
-  // }
+      ),
+    );
+   }
 
   Widget profileDetail(userData) {
     return Stack(
       children: [
         Container(
-          // color: Colors.grey,
           height: Get.height/2.5,
           width: Get.width,
           child: ClipRRect(
@@ -65,18 +64,12 @@ class _UserProfileState extends State<UserProfile> with AutomaticKeepAliveClient
             children: [
               IconButton(
                 onPressed:() {
-
-                  Get.to(BottomTabs());
+                  // Get.toNamed('/tabs');
+                  Get.back();
                   banner.bannerController();
                 },
                 icon: Icon(Icons.arrow_back,color: Colors.white)
               ),
-              // Center(
-              //   widthFactor: 3,
-              //   child: Container(
-              //     child: Text("JUNAID",style: TextStyle(color: Colors.white,fontSize: 24,fontWeight: FontWeight.bold),),
-              //   ),
-              // )
             ],
           ),
         ),
@@ -130,7 +123,6 @@ class _UserProfileState extends State<UserProfile> with AutomaticKeepAliveClient
               child: Column(
                 children: [
                   Row(
-                    // mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       Expanded(
                         flex: 1,
@@ -138,16 +130,16 @@ class _UserProfileState extends State<UserProfile> with AutomaticKeepAliveClient
                          margin: lang == 'ar'? EdgeInsets.only(right:20) :EdgeInsets.only(left: 20),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            // mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text("name".tr,style: TextStyle(fontWeight: FontWeight.bold,color:Colors.grey),),
-                             userData["name"] != null ?
+                              Text("name".tr,style: TextStyle(fontWeight: FontWeight.bold,color:Colors.grey)
+                              ),
+                              userData["name"] != null ?
                               Container(
                                 margin: EdgeInsets.only(top: 5),
                                 child:
                                 Text(userData["name"].toString(),style: TextStyle(fontWeight: FontWeight.w600)),
                               ): Container(),
-                               userData["mobile"] != null ?
+                              userData["mobile"] != null ?
                               Container(
                                 margin: EdgeInsets.only(top:25),
                                 child: Text("mobile".tr,style: TextStyle(fontWeight: FontWeight.bold,color:Colors.grey),),
@@ -172,13 +164,10 @@ class _UserProfileState extends State<UserProfile> with AutomaticKeepAliveClient
                               margin: EdgeInsets.only(top:5),
                               child: GestureDetector(
                                 onTap: (){
-      
                                   showDialog(
                                     context: context,
                                     builder: (context) {
                                       return Dialog(
-                                        // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                                        // elevation: 16,
                                         child: Container(
                                           height: Get.height/7,
                                           child: Column(
@@ -190,16 +179,18 @@ class _UserProfileState extends State<UserProfile> with AutomaticKeepAliveClient
                                               ),
                                               Container(
                                                 margin: lang == 'ar'? EdgeInsets.only(right:20,top:5) :EdgeInsets.only(left: 20,top:5),
-                                                child: Text(userData["email"].toString(),style: TextStyle(fontWeight: FontWeight.bold,color:Colors.black),)),
-      
+                                                child: Text(userData["email"].toString(),
+                                                style: TextStyle(fontWeight: FontWeight.bold,color:Colors.black),)
+                                              ),
                                             ],
                                           ),
                                         ),
                                       );
-                                });},
-                                child: Text(
-                                  userData["email"].length > 20 ? userData["email"].substring(0, 20)+'...' : userData["email"],
-                                  style: TextStyle(fontWeight: FontWeight.w600)),
+                                    });
+                                  },
+                                  child: Text(
+                                    userData["email"].length > 20 ? userData["email"].substring(0, 20)+'...' : userData["email"],
+                                    style: TextStyle(fontWeight: FontWeight.w600)),
                               ),
                             ):Container(),
                             Container(
@@ -211,7 +202,6 @@ class _UserProfileState extends State<UserProfile> with AutomaticKeepAliveClient
                                 margin: EdgeInsets.only(bottom:20,top: 5),
                               child: GestureDetector(
                                 onTap: (){
-      
                                   showDialog(
                                     context: context,
                                     builder: (context) {
@@ -227,17 +217,21 @@ class _UserProfileState extends State<UserProfile> with AutomaticKeepAliveClient
                                               ),
                                               Container(
                                                 margin: EdgeInsets.only(top:5),
-                                                child: Text(userData["address"].toString(),style: TextStyle(fontWeight: FontWeight.bold,color:Colors.black),)),
-      
+                                                child: Text(userData["address"].toString(),
+                                                  style: TextStyle(fontWeight: FontWeight.bold,color:Colors.black),
+                                                )
+                                              ),
                                             ],
                                           ),
                                         ),
                                       );
-                                });},
+                                    });
+                                  },
       
                                 child: Text(
                                   userData["address"].length > 20 ? userData["address"].substring(0, 20)+'...' : userData["address"],
-                                  style: TextStyle(fontWeight: FontWeight.w600)),
+                                  style: TextStyle(fontWeight: FontWeight.w600)
+                                ),
                               ),
                             ): Container(
                               height: 45,
@@ -334,6 +328,7 @@ class _UserProfileState extends State<UserProfile> with AutomaticKeepAliveClient
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
+                      width:Get.width,
                       margin: EdgeInsets.symmetric(horizontal:10,vertical:10),
                       child: Text("about".tr,style: TextStyle(fontWeight: FontWeight.bold,color:Colors.grey))
                     ),

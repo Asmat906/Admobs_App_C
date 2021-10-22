@@ -12,14 +12,18 @@ class UniversityController extends GetxController {
   void onInit(){
     isLoading = true;
     getUniversities();
+    dataUni = [];
     super.onInit();
   }
-
+  
   getUniversities() async{
+    dataUni = [];
     isLoading = true ;
     await university().then((res) {
       universityData = jsonDecode(res.body);
-      dataUni = universityData['data'];
+        for(int c =0; c < universityData['data'].length; c++){
+          dataUni.add(universityData['data'][c]);
+        }
       isLoading = false;
     });
     update();

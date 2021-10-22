@@ -3,16 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:success_stations/controller/friends_controloler.dart';
-import 'package:success_stations/styling/app_bar.dart';
 import 'package:success_stations/styling/colors.dart';
 import 'package:success_stations/styling/images.dart';
-import 'package:success_stations/view/drawer_screen.dart';
+import 'package:success_stations/view/friends/friends_profile.dart';
+import 'package:success_stations/view/shimmer.dart';
 
 class FriendReqList extends StatefulWidget {
   _FriendReqListState createState() => _FriendReqListState();
 }
 class _FriendReqListState extends State<FriendReqList> {
    final friCont = Get.put(FriendsController());
+   // ignore: unused_field
    final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
    GetStorage box = GetStorage();
    var id;
@@ -27,36 +28,45 @@ class _FriendReqListState extends State<FriendReqList> {
   @override
   Widget build(BuildContext context) {
      return Scaffold(
-        key: _scaffoldKey,
-        appBar:  PreferredSize( preferredSize: Size.fromHeight(70.0),
-        child: appbar(_scaffoldKey,context,AppImages.appBarLogo, AppImages.appBarSearch,1)),
-        drawer: Theme(
-          data: Theme.of(context).copyWith(
-            // canvasColor: AppColors.botomTiles
-          ),
-          child: AppDrawer(),
-        ),
-       body: ListView(
-         children: [
-           GetBuilder<FriendsController>(
-          init: FriendsController(),
-          builder: (val) {
-            return val.suggestionsData == null ? Container() : val.suggestionsData.length == 0  || val.suggestionsData == null? Container(
-              child: Container(
-                child:
-               Text("suggestion".tr ,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 24) )
+        appBar: AppBar(
+           leading: GestureDetector(
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () => Get.back(),
+                child: Container(
+                  margin: EdgeInsets.only(left:10, top:5),
+                  child: Icon(Icons.arrow_back,
+                    color: Colors.white, size: 25
+                  ),
+                ),
               ),
-            ) :  Column(
-              children: [
+            ],
+          )
+        ),
+          centerTitle: true,
+        title: Image.asset(AppImages.appBarLogo, height:35),
+        backgroundColor: AppColors.appBarBackGroundColor),
+        body: ListView(
+          children: [
+           GetBuilder<FriendsController>(
+            init: FriendsController(),
+            builder: (val) {
+              return val.suggestionsData == null ? friendReqShimmer() : val.suggestionsData.length == 0  || val.suggestionsData == null? 
+              Container(
+                  child: Text("suggestion".tr ,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 24) 
+                )
+                
+              ) :  Column(
+                children: [
                 val.friendsData != null ? 
                 Column(
                   children:
                     friendList(val.friendsData['data']),
-                ):Container(),
-                SizedBox(
-                  height: 20,
-                ),
-                // Divider(),
+                ):friendReqShimmer(),
+                // SizedBox(
+                //   height: 20,
+                // ),
                  Column(
                   children:
                     sugesstionList(val.suggestionsData),
@@ -69,7 +79,6 @@ class _FriendReqListState extends State<FriendReqList> {
      );
   }
   List<Widget> friendList(data) { 
-      
     var count = 0;
      List<Widget> req = [];
      if(data != null)
@@ -81,7 +90,7 @@ class _FriendReqListState extends State<FriendReqList> {
            crossAxisAlignment: CrossAxisAlignment.start,
            children: [
             count == 1  ?  Container(
-              margin: EdgeInsets.only(top: 20,left: 20,right: 20),
+              margin: EdgeInsets.only(left: 20,right: 20),
               child: Text(
                 'frien_request'.tr,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 24),
               ),
@@ -94,7 +103,7 @@ class _FriendReqListState extends State<FriendReqList> {
                 child: Row(
                   children: [
                     id == data[i]['requister_id'] ? 
-                Container(
+                  Container(
                   margin: EdgeInsets.symmetric(vertical:10.0,horizontal:10.0),
                   child: CircleAvatar(
                     radius: 30,
@@ -104,8 +113,8 @@ class _FriendReqListState extends State<FriendReqList> {
                     ,child: Image.network(data[i]['user_requisted']['image']['url'],fit: BoxFit.fill,height: 60,width: 60,)) : 
                         Image.asset(AppImages.person),
                   ),
-                ):
-                Container(
+                  ):
+                  Container(
                   margin: EdgeInsets.symmetric(vertical:10.0,horizontal:10.0),
                   child: CircleAvatar(
                     radius: 30,
@@ -116,9 +125,10 @@ class _FriendReqListState extends State<FriendReqList> {
                   ),
                 ),
                     Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      // crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
+                          // margin:EdgeInsets.only(left:10),
                           width: Get.width/4,
                           child: id == data[i]['requister_id'] ?  Text(data[i]['user_requisted']['name'],style: TextStyle(fontWeight: FontWeight.bold),):
                       Text(data[i]['requister']['name'],style: TextStyle(fontWeight: FontWeight.bold),)
@@ -247,18 +257,17 @@ class _FriendReqListState extends State<FriendReqList> {
            crossAxisAlignment: CrossAxisAlignment.start,
            children: [
               i == 0 ?  Container(
-              margin: EdgeInsets.only(top: 20,left: 20,bottom: 10, right: 20),
+              margin: EdgeInsets.only(left: 20,bottom: 10, right: 20),
               child: Text(
                 "suggestion".tr,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 24),
               ),
             ):Container(),
              GestureDetector(
               onTap: (){
-                Get.toNamed('/friendProfile' ,arguments: data[i]['id'] );
+                Get.to(FriendProfile() ,arguments: ['',data[i]['id']] );
               },
               child: Card(
                 child: Row(
-                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
                       margin: EdgeInsets.symmetric(vertical:10.0,horizontal:0.0),
@@ -266,7 +275,7 @@ class _FriendReqListState extends State<FriendReqList> {
                         radius: 30,
                         backgroundColor: Colors.grey[100],
                         child: data[i]['media'].length != 0 ?   ClipRRect(
-                    borderRadius: BorderRadius.circular(50.0),child: Image.network(data[i]['media'][0]['url'],fit: BoxFit.fill,height: 60,width: 60,)) : 
+                        borderRadius: BorderRadius.circular(50.0),child: Image.network(data[i]['media'][0]['url'],fit: BoxFit.fill,height: 60,width: 60,)) : 
                         Image.asset(AppImages.person),
                       ),
                     ),
@@ -274,6 +283,7 @@ class _FriendReqListState extends State<FriendReqList> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
+                          margin:EdgeInsets.only(left:10),
                            width: Get.width/4,
                           child: Text(data[i]['name'],style: TextStyle(fontWeight: FontWeight.bold),),
                         ),

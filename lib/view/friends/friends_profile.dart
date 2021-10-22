@@ -6,6 +6,7 @@ import 'package:success_stations/controller/inbox_controller/chat_controller.dar
 import 'package:success_stations/styling/colors.dart';
 import 'package:success_stations/styling/images.dart';
 import 'package:success_stations/view/messages/chatting_page.dart';
+import 'package:success_stations/view/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class FriendProfile extends StatefulWidget {
@@ -14,28 +15,22 @@ class FriendProfile extends StatefulWidget {
 
 class _FriendProfileState extends State<FriendProfile>
     with SingleTickerProviderStateMixin {
-  late DefaultTabController _controller;
   GetStorage box = GetStorage();
+  // ignore: unused_field
   int _selectedIndex = 0;
   final friCont = Get.put(FriendsController());
   final chatCont = Get.put(ChatController());
   bool liked = false;
-  var city;
-  var id;
-  var selectedUser;
-  var requister;
-  var textHolder;
-  var notifyid;
-  var adID;
+  var city, id ,selectedUser,requister, textHolder,notifyid,adID,dtaaa,lang;
   bool choice = false;
-  var dtaaa;
-  var langg;
+ 
   @override
   void initState() {
     super.initState();
+    lang = box.read('lang_code');
     selectedUser = box.read("selected");
     requister = box.read("requister");
-    langg = box.read('lang_code');
+    // langg = box.read('lang_code');
     dtaaa = Get.arguments;
     id = dtaaa[1];
     friCont.friendDetails(id);
@@ -54,8 +49,8 @@ class _FriendProfileState extends State<FriendProfile>
               return val.friendProfileData == null || val.userAds == null
                   ? SingleChildScrollView(
                       child: Container(
-                          // margin: EdgeInsets.only(top: 20,bo),
-                          child: Center(child: CircularProgressIndicator())))
+                          margin: EdgeInsets.only(top: 40),
+                          child:friendProfileShimmer() ))
                   : val.friendProfileData['success'] == false &&
                           val.friendProfileData['errors'] ==
                               'No Profile Available'
@@ -79,6 +74,7 @@ class _FriendProfileState extends State<FriendProfile>
   var image;
   Widget profileDetail(data) {
     var country = data['country'];
+    print("/////// ${data['country']}");
     if (data['image'] != null) {
       image = data['image']['url'];
       box.write('chat_image', image);
@@ -166,7 +162,7 @@ class _FriendProfileState extends State<FriendProfile>
                         " ",
                       )),
             Container(
-              margin: EdgeInsets.only(top: 0),
+              margin: EdgeInsets.only(top: 0,left: 15 ),
               child: data['degree'] != null
                   ? Text(data['degree'],
                       style: TextStyle(
@@ -175,7 +171,7 @@ class _FriendProfileState extends State<FriendProfile>
                           fontWeight: FontWeight.w400))
                   : Text(""),
             ),
-            country['name'] != null
+            country != null
                 ? Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -185,7 +181,7 @@ class _FriendProfileState extends State<FriendProfile>
                     SizedBox(width: 5),
                     Container(
                       margin: EdgeInsets.only(top: 6),
-                      child: Text(country['name'],
+                      child: Text(country['name'][lang] !=null ? country['name'][lang]:  country['name'][lang] == null ? country['name']['en']:'',
                           style: TextStyle(
                           color: Colors.white,
                           fontSize: 20,
@@ -205,7 +201,7 @@ class _FriendProfileState extends State<FriendProfile>
       children: [
         FractionalTranslation(
           translation: 
-          langg == 'ar' ?  Offset(-0.5, -0.5):
+          lang == 'ar' ?  Offset(-0.5, -0.5):
           const Offset(0.6, -0.5),
           child: Container(
             child: GestureDetector(
@@ -229,8 +225,8 @@ class _FriendProfileState extends State<FriendProfile>
                 decoration: BoxDecoration(
                   color: AppColors.appBarBackGroundColor,
                   borderRadius: BorderRadius.circular(50)),
-                child: name['is_user_friend'].length == 0 ||
-                name['is_user_friend'] == null
+                child:
+                name['is_user_friend'] == null || name['is_user_friend'].length == null
                 ? Center(
                   child: Text(
                     "addFriend".tr,
@@ -255,7 +251,7 @@ class _FriendProfileState extends State<FriendProfile>
           )
         ),
         FractionalTranslation(
-          translation: langg == 'ar' ?  Offset(-0.7, -0.5):
+          translation: lang == 'ar' ?  Offset(-0.7, -0.5):
               const Offset(0.7, -0.5),
           child: GestureDetector(
             // margin: EdgeInsets.only(left: 250),
@@ -283,7 +279,7 @@ class _FriendProfileState extends State<FriendProfile>
           ),
         ),
         SizedBox(
-          height: langg == 'en' ? 30 : 50,
+          height: lang == 'en' ? 30 : 50,
           child: Container(
               width: double.infinity,
               decoration: BoxDecoration(
@@ -324,9 +320,8 @@ class _FriendProfileState extends State<FriendProfile>
   }
 
   Widget general(data, adsData) {
-    var country = data['country'];
-    city = data['city'];
-    city = city['city'];
+    // city = data['city'];
+    // city = city['city'];
     return Expanded(
       flex: 1,
       child: TabBarView(
@@ -345,7 +340,7 @@ class _FriendProfileState extends State<FriendProfile>
                           Expanded(
                             flex: 1,
                             child: Container(
-                                padding:langg == 'ar'? EdgeInsets.only(right:20,) :EdgeInsets.only(left: 20,),
+                                padding:lang == 'ar'? EdgeInsets.only(right:20,) :EdgeInsets.only(left: 20,),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 // mainAxisAlignment: MainAxisAlignment.center,
@@ -531,7 +526,7 @@ class _FriendProfileState extends State<FriendProfile>
                 Card(
                   elevation: 2,
                   child: Container(
-                      padding:langg == 'ar'? EdgeInsets.only(right:20,) :EdgeInsets.only(left: 20,),
+                      padding:lang == 'ar'? EdgeInsets.only(right:20,) :EdgeInsets.only(left: 20,),
                     child: Column(
                       
                       children: [
@@ -658,7 +653,7 @@ class _FriendProfileState extends State<FriendProfile>
                 ),
                 Card(
                   child: Container(
-                     padding:langg == 'ar'? EdgeInsets.only(right:20,) :EdgeInsets.only(left: 20,),
+                     padding:lang == 'ar'? EdgeInsets.only(right:20,) :EdgeInsets.only(left: 20,),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -671,7 +666,7 @@ class _FriendProfileState extends State<FriendProfile>
                                     fontWeight: FontWeight.bold,
                                     color: Colors.grey))),
                         data["about"] != null
-                            ? Container(
+                            ? Container(width: Get.width,
                                 margin: EdgeInsets.symmetric(
                                     horizontal: 10, vertical: 10),
                                 child: Text(data["about"],
@@ -705,7 +700,7 @@ class _FriendProfileState extends State<FriendProfile>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                          width: langg == 'en' ? Get.width/3.3 : Get.width/3.5,
+                          width: lang == 'en' ? Get.width/3.3 : Get.width/3.5,
                           margin: EdgeInsets.symmetric(
                               vertical: 6.0, horizontal: 10.0),
                           child: ClipRRect(
@@ -742,19 +737,19 @@ class _FriendProfileState extends State<FriendProfile>
                                 height: 15,
                               ),
                               // Icon(Icons.person,color: Colors.grey),
-                              SizedBox(width: 5),
-                              Container(
-                                child: Row(
-                                  children: [
-                                    city != null ? Text(city) : Text(""),
-                                    Text(","),
-                                    adsData[index]['country'] != null
-                                        ? Text(
-                                            adsData[index]['country']['name'])
-                                        : Text(""),
-                                  ],
-                                ),
-                              ),
+                              // SizedBox(width: 5),
+                              // Container(
+                              //   child: Row(
+                              //     children: [
+                              //       city != null ? Text(city) : Text(""),
+                              //       Text(","),
+                              //       adsData[index]['country'] != null
+                              //           ? Text(
+                              //               adsData[index]['country']['name']['en'])
+                              //           : Text(""),
+                              //     ],
+                              //   ),
+                              // ),
                             ],
                           ),
                           SizedBox(

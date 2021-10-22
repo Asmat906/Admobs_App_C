@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:success_stations/controller/subscription_controller.dart';
-import 'package:success_stations/styling/app_bar.dart';
 import 'package:success_stations/styling/button.dart';
 import 'package:success_stations/styling/colors.dart';
 import 'package:success_stations/styling/get_size.dart';
@@ -16,6 +15,7 @@ class _StateIndividualMemeberShip extends State<IndividualMemeberShip> {
   bool statustogle = false;
   bool value = true;
   final memberShipCon = Get.put(MemberShipController());
+   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<String> memberShipDatta = [
     "profile".tr,
     "my_ads".tr,
@@ -36,9 +36,24 @@ class _StateIndividualMemeberShip extends State<IndividualMemeberShip> {
   Widget build(BuildContext context) {
     final space20 = SizedBox(height: getSize(20, context));
     return Scaffold(
-      appBar: PreferredSize(
-          preferredSize: Size.fromHeight(70.0),
-          child: sAppbar(context, Icons.arrow_back_ios, AppImages.appBarLogo)),
+      key: _scaffoldKey,
+      appBar: AppBar(
+         leading: GestureDetector(
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () => Get.back(),
+                child: Container(
+                  margin: EdgeInsets.only(left:10, top:5),
+                  child: Icon(Icons.arrow_back,
+                    color: Colors.white, size: 25
+                  ),
+                ),
+              ),
+            ],
+          )
+        ),
+        centerTitle: true,title: Text('mmembership'.tr),backgroundColor: AppColors.appBarBackGroundColor),
       body: Column(
         children: [
           space20,
@@ -105,7 +120,7 @@ class _StateIndividualMemeberShip extends State<IndividualMemeberShip> {
 
   Widget headingMember() {
     return Container(
-        margin: EdgeInsets.only(left: 0),
+        margin: EdgeInsets.only(left: 15),
         child: Text('head_members'.tr,
             style: TextStyle(fontSize: 17, color: Colors.grey[600])));
   }

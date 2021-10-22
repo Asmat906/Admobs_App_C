@@ -30,6 +30,8 @@ class AppImages {
   static String ugr = imagePath + 'uagr.png';
   static String ma = imagePath + 'ma.png';
   static String membership = imagePath + 'memr.png';
+  static String menuBurger = imagePath + 'menu-Drawer.png';
+  static String menuBurgerArabic = imagePath + 'menu@3x.png';
   
   //Bottombar images
   static String offers = imagePath + 'offer.png';
@@ -79,7 +81,7 @@ class AppImages {
   static String person = imagePath + "usernqame@3x.png";
 
   //maps
-  static String map1= imagePath + "mapIcon.png";
+  static String map1= imagePath + "map@3x.png";
   static String map= imagePath + "map.png";
   static String gridView = imagePath + 'grid.png';
   static String delete = imagePath + 'delete.png';
@@ -93,4 +95,17 @@ class AppImages {
   static String camera = imagePath + 'cam@3x.png';
   static String junaid = imagePath + 'junaid.jpeg';
   static String hehe = imagePath + 'hehe.png';
+
+  // new des
+  static String newuser = imagePath + 'newuser.png';
+  static String newcall = imagePath + 'newcall.png';
+  static String newfilter = imagePath + 'newfilter.png';
+
+  //APPbAR
+  static String listingImage = imagePath + 'listtt.png';
+  static String filterImage = imagePath + 'filterred.png';
+  static String gridListing = imagePath + 'gridd.png';
+  static String plusImage1 = imagePath + 'plus@3x.png';
+
+
 }

@@ -9,7 +9,7 @@ class AllUsersController extends GetxController {
   bool isLoading = false; 
   var userData;
   GetStorage box = GetStorage();
-    @override
+  @override
   void onInit(){
     isLoading = true;
     super.onInit();

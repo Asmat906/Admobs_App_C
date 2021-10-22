@@ -40,6 +40,7 @@ class LocationController extends GetxController {
 editLocationToDB(id,data) async{
     isLoading = true;
     await editLocation(id,data).then((value) {
+      print("....................${value.statusCode}");
       if(value.statusCode == 200 || value.statusCode < 400){
         editLoc = jsonDecode(value.body);
          Get.to(MyLocations());
@@ -54,6 +55,7 @@ deleteLocationToDB(id,userId) async {
     isLoading = true;
     await deleteLocation(id).then((value) {
       if(value.statusCode == 200 || value.statusCode < 400){
+        // ignore: unused_local_variable
         var del = jsonDecode(value.body);
         isLoading = false;
         getMyLocationToDB(userId);
@@ -97,10 +99,11 @@ deleteLocationToDB(id,userId) async {
     update();
   }
 
-   getAllLocationByCity(city,) async {
+   getAllLocationByCity(city,nameS) async {
+     print(city);
     isLoading = true;
     allLoc = null;
-    await getAllCityLocation(city).then((value) {
+    await getAllCityLocation(city,nameS).then((value) {
       allLoc = jsonDecode(value.body);
       isLoading = false;
     });

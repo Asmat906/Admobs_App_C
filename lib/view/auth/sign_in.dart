@@ -11,7 +11,6 @@ import 'package:success_stations/styling/text_field.dart';
 import 'package:success_stations/utils/facebook_signIn.dart';
 import 'package:success_stations/utils/google_signIn.dart';
 import 'package:success_stations/utils/page_util.dart';
-import 'package:success_stations/view/auth/language.dart';
 import 'package:success_stations/view/bottom_bar.dart';
 import 'package:success_stations/view/i18n/app_language.dart';
 
@@ -195,7 +194,7 @@ class _SignPageState extends State<SignIn> {
         isObscure: false,
         hintText: "emails".tr,
         hintStyle: TextStyle(
-          fontSize: 16,
+          fontSize: lang == 'ar' ? 14 : 16,
           color: Colors.grey,
         ),
         contentPadding:
@@ -223,7 +222,7 @@ class _SignPageState extends State<SignIn> {
         hint: hintTextLang!=null
         ? Text(hintTextLang,
          
-          style: TextStyle(fontSize: 18, color: AppColors.inputTextColor))
+          style: TextStyle(fontSize: lang == 'ar' ? 14 : 16, color: AppColors.inputTextColor))
         : hintTextLang == null && lang == null
         ? Text("English")
         : Text(lang),
@@ -271,7 +270,7 @@ class _SignPageState extends State<SignIn> {
             hintText: ('password'.tr),
             hintStyle: TextStyle(
               color: Colors.grey,
-              fontSize: 16,
+               fontSize: lang == 'ar' ? 14 : 16,
             ),
             // labelStyle: TextStyle(color: AppColors.basicColor),
             fillColor: AppColors.inputColor,
@@ -321,7 +320,7 @@ class _SignPageState extends State<SignIn> {
           ),
           GestureDetector(
               onTap: () {
-                Get.to(Language());
+                Get.toNamed('/langua');
               },
               child: Text(
                 'sign_up_text'.tr,

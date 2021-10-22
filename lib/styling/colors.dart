@@ -27,4 +27,5 @@ class AppColors {
 
   //snackBar
   static Color snackBarColor = Color(0xFFD63B00);
+  static Color newphoneColor = Color(0xFFD1692B2);
 }

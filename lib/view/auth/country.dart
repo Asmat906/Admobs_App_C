@@ -17,11 +17,19 @@ class Ccountry extends StatefulWidget {
 
 class _CountryPageState extends State<Ccountry> {
   TextEditingController emailController = TextEditingController();
-  var countrycOde, countryId;
-
-  var selectedIndex;
+  var countrycOde, countryId, selectedIndex, lang;
   GetStorage box = GetStorage();
+
+  @override
+  void initState() {
+    super.initState(); 
+    lang = box.read('lang_code');
+  }
+
+  
   Widget featureCountryList(countryListData) {
+  
+  
     return Container(
       alignment: Alignment.bottomCenter,
       height: MediaQuery.of(context).size.height / 4.30,
@@ -30,6 +38,7 @@ class _CountryPageState extends State<Ccountry> {
           shrinkWrap: true,
           itemCount: countryListData.length,
           itemBuilder: (BuildContext context, int index) {
+              print("country name .....${ countryListData[index]['name'][lang]  == null || countryListData[index]['name'][lang] == ' '}");
             return GestureDetector(
               onTap: () {
                 setState(() {
@@ -45,7 +54,7 @@ class _CountryPageState extends State<Ccountry> {
                 children: [
                   GestureDetector(
                     onTap: (){
-                      Get.to(TabBarPage(), arguments: [countryListData[index]['short_code'], countryListData[index]['id']]);
+                      Get.to(TabBarPage(), arguments: countryListData[index]);
                     },
                     child: Container(
                       margin: EdgeInsets.only(left: 20),
@@ -68,9 +77,12 @@ class _CountryPageState extends State<Ccountry> {
                     ),
                   ),
                   Container(
-                      child: countryListData[index]['name'] != null
-                          ? Text(countryListData[index]['name']['en'],style: TextStyle(color: AppColors.inputTextColor),)
-                          : Container())
+                    child: 
+                      Text(countryListData[index]['name'][lang] !=null && countryListData[index]['name'][lang] != ' ' ? countryListData[index]['name'][lang] :
+                      countryListData[index]['name'][lang]  == null || countryListData[index]['name'][lang] == ' ' ?  countryListData[index]['name']['en']:'',
+
+                        style: TextStyle(color: AppColors.inputTextColor),)
+                  )
                 ],
               ),
             );
@@ -155,10 +167,10 @@ class _CountryPageState extends State<Ccountry> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text("have_account".tr, 
-              style: TextStyle( fontSize: 18, fontWeight: FontWeight.w300,color: Colors.grey
+              style: TextStyle(fontWeight: FontWeight.w300,color: Colors.grey
               ),
             ),
-            Text("sign_in".tr, style: TextStyle(fontSize: 18 ,  color: AppColors.appBarBackGroundColor, fontWeight: FontWeight.bold),),
+            Text("sign_in".tr, style: TextStyle(color: AppColors.appBarBackGroundColor, fontWeight: FontWeight.bold),),
           ],
         ),
       ),

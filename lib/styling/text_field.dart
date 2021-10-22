@@ -16,6 +16,8 @@ class CustomTextFiled extends StatefulWidget {
   final bool autoFocus;
   final  validator;
   final contentPadding;
+  final keyboardType;
+  final maxLine;
   CustomTextFiled(
     {
       this.hintText ='',
@@ -33,6 +35,8 @@ class CustomTextFiled extends StatefulWidget {
       required this.onSaved,
       this.hintStyle,
       this.contentPadding,
+      this.keyboardType,
+      this.maxLine
 
     }
   );
@@ -50,7 +54,12 @@ class _CustomTextFiledState extends State<CustomTextFiled> {
           // height:55,
           child: Padding(
             padding: widget.padding,
-            child: TextFormField(     
+            child: TextFormField( 
+              maxLines: widget.maxLine,
+              keyboardType: widget.keyboardType, 
+              style: TextStyle(
+                color:AppColors.inputTextColor
+              ),   
                 focusNode: FocusNode(),      
                 controller: widget.textController,
                 onFieldSubmitted: widget.onFieldSubmitted,
@@ -59,10 +68,11 @@ class _CustomTextFiledState extends State<CustomTextFiled> {
                 obscureText: widget.isObscure,
                 onSaved: widget.onSaved,
                 decoration: InputDecoration(
+                  border: InputBorder.none,
                   contentPadding: widget.contentPadding,
                   fillColor: AppColors.inputColor,
                   filled: true,
-                  border: InputBorder.none,
+                  // border: InputBorder.none,
                   errorBorder: OutlineInputBorder(
                      borderSide: BorderSide(
                       color: Colors.red

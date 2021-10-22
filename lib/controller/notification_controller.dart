@@ -1,9 +1,7 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:success_stations/action/notification_action.dart';
 import 'package:success_stations/styling/colors.dart';
-import 'package:success_stations/view/auth/notification.dart';
 
 class NotificationController extends GetxController {
  
@@ -32,7 +30,6 @@ class NotificationController extends GetxController {
     await deleteNotificationAction(data).then((res) {
        deleteNotification = jsonDecode(res.body);
       if(res.statusCode < 400){
-        // Get.off(NotificationPage());
     allNoti();
         isLoading=false;
       } if(res.statusCode > 400){

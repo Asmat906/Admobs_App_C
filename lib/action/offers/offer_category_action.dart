@@ -24,11 +24,12 @@ Future<http.Response>editOffers(data,id) async {
   await ApiHeaders().getData();
   final Config conf = Config();
   var url = Uri.parse("${conf.baseUrl}edit-offers/$id");
+  print("url of edit offers....$url");
   final result = await http.post(url,body: json.encode(data),headers: ApiHeaders().headersWithToken );
   return result;
 }
 
-Future<http.Response> allOffers() async {
+Future<http.Response> allOfers() async {
   await ApiHeaders().getData();
   final Config config = Config();
   var url =  Uri.parse("${config.baseUrl}offers-having-ads");

@@ -1,8 +1,10 @@
-import 'dart:io';
+// ignore_for_file: import_of_legacy_library_into_null_safe
 
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:dio/dio.dart' as dio;
 import 'package:google_fonts_arabic/fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:success_stations/controller/ad_posting_controller.dart';
@@ -16,25 +18,7 @@ import 'package:success_stations/styling/images.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:success_stations/styling/text_style.dart';
 import 'package:success_stations/utils/app_headers.dart';
-import 'package:success_stations/utils/favourite.dart';
-import 'package:success_stations/view/UseProfile/privacy.dart';
-import 'package:success_stations/view/UseProfile/user_agreement.dart';
-import 'package:success_stations/view/UseProfile/user_profile.dart';
-import 'package:success_stations/view/about_us.dart';
-import 'package:success_stations/view/auth/advertise.dart';
-import 'package:success_stations/view/auth/choose_language.dart';
-import 'package:success_stations/view/auth/contact.dart';
-import 'package:success_stations/view/auth/my_adds/draft_ads_list.dart';
-import 'package:success_stations/view/auth/my_adds/my_adds.dart';
-import 'package:success_stations/view/auth/notification.dart';
-import 'package:success_stations/view/bottom_bar.dart';
-import 'package:success_stations/view/friends/friend_request.dart';
-import 'package:success_stations/view/google_map/my_locations.dart';
 import 'package:success_stations/view/membership/pro_indivual_membership.dart';
-import 'package:success_stations/view/messages/inbox.dart';
-import 'package:success_stations/view/offers/my_offers.dart';
-import 'package:google_fonts_arabic/google_fonts_arabic.dart';
-import 'package:dio/dio.dart' as dio;
 
 class AppDrawer extends StatefulWidget {
  const AppDrawer({ Key? key }) : super(key: key);
@@ -47,21 +31,23 @@ class _AppDrawerState extends State<AppDrawer> {
   final logoutCont = Get.put(LoginController());
   var image;
   GetStorage box = GetStorage();
-    final ImagePicker _picker = ImagePicker();  
-    XFile? pickedFile;
-    var imageP;
-    var fileName;
-    var userType,accountType;
-    final banner = Get.put(BannerController());
-    final getLang = Get.put(LanguageController());
-var lang;
+  final ImagePicker _picker = ImagePicker();  
+  XFile? pickedFile;
+  var imageP;
+  var fileName;
+  var userType,accountType;
+  final banner = Get.put(BannerController());
+  final getLang = Get.put(LanguageController());
+  var lang;
+  var uploadedImage;
+
   @override
   void dispose() {
     banner.bannerController();
     super.dispose();
-
   }
-   @override
+
+  @override
   void initState() {
     super.initState();
     getLang.getLanguas();
@@ -70,7 +56,8 @@ var lang;
     imageP = box.read('user_image_local');
     accountType = box.read('account_type');
     lang = box.read('lang_code');
-   
+    box.read('name');
+    print("box .read najme ........${ box.read('name')}");
     banner.bannerController();
     
   }
@@ -82,24 +69,27 @@ var lang;
    
     setState(() {
       if (pickedFile != null) {
-        imageP = pickedFile!.path;    
-        
+        imageP = pickedFile!.path;           
         box.write("user_image_local", imageP);
         fileName = pickedFile!.path.split('/').last;  
       } else {
       
       }
     });
-      try {
-          dio.FormData formData = dio.FormData.fromMap({          
-            "file": await dio.MultipartFile.fromFile(pickedFile!.path, filename:fileName),            
-          });
-         
-          Get.find<AdPostingController>().uploadAdImage(formData); 
-          Get.find<UserProfileController>().getUserProfile();
-        } catch (e) {
+    try {
+        dio.FormData formData = dio.FormData.fromMap({          
+          "file": await dio.MultipartFile.fromFile(pickedFile!.path, filename:fileName),            
+        });     
+        Get.find<AdPostingController>().uploadAdImage(formData); 
+        uploadedImage  = Get.find<AdPostingController>().adUpload['name'];
 
-        }
+        Get.find<UserProfileController>().getUserProfile();
+      } catch (e) {
+      }
+      var json = {
+        'image':uploadedImage
+      };
+       Get.find<UserProfileController>().updateProfile(json); 
   }
 
   @override
@@ -119,7 +109,7 @@ var lang;
                       color: AppColors.appBarBackGroundColor,
                       width: Get.width,
                       height: Get.height/4,
-                      padding: lang == 'ar' ? EdgeInsets.only(right: 10,top: 20): EdgeInsets.only(left: 10,top: 20),
+                      padding: lang == 'ar' ? EdgeInsets.only(top: 20): EdgeInsets.only(top: 20),
                       child: GestureDetector(
                         onTap: () {
                         },
@@ -132,58 +122,65 @@ var lang;
                                onTap:() { 
                                 getImage();
                               },
-                              child: Center(
-                                child: Row(
-                                  children: [
-                                    Stack(
-                                      children: [
-                                        Container(
-                                          // margin:EdgeInsets.only(left: 10),
-                                          decoration: BoxDecoration(
-                                            border: Border.all(width: 3,color: Colors.white),
-                                              shape: BoxShape.circle,),
-                                            child: CircleAvatar(
-                                            backgroundColor: Colors.grey[200],
-                                            radius: 60.0,
-                                            child:ClipRRect(
-                                              borderRadius: BorderRadius.circular(60.0),
-                                              child:                                       
-                                              imageP.toString() != 'null' || imageP == null ?
-                                                Image.file(File(imageP),fit: BoxFit.cover,height: Get.height/5,width: Get.width/3.3,):
-                                                image.toString() == 'null' || image == null ? 
-                                              Image.asset(AppImages.person,color: Colors.grey[400]) : 
-                                              Image.network(
-                                                image['url'],
-                                                fit: BoxFit.fill,
-                                                height: Get.height/6,width: Get.width/3.0,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Stack(
+                                        children: [
+                                          Container(
+                                            // margin:EdgeInsets.only(left: 10),
+                                            decoration: BoxDecoration(
+                                              border: Border.all(width: 3,color: Colors.white),
+                                                shape: BoxShape.circle,),
+                                              child: CircleAvatar(
+                                              backgroundColor: Colors.grey[200],
+                                              radius: 40.0,
+                                              child:ClipRRect(
+                                                borderRadius: BorderRadius.circular(60.0),
+                                                child:                                       
+                                                imageP.toString() != 'null' || imageP == null ?
+                                                  Image.file(File(imageP),fit: BoxFit.cover,height: Get.height/5,width: Get.width/3.3,):
+                                                  image.toString() == 'null' || image == null ? 
+                                                Image.asset(AppImages.person,color: Colors.grey[400]) : 
+                                                Image.network(
+                                                  image['url'],
+                                                  fit: BoxFit.fill,
+                                                  height: Get.height/6,width: Get.width/3.0,
+                                                )
                                               )
-                                            )
+                                            ),
                                           ),
-                                        ),
-                                        FractionalTranslation(
-                                          translation :  lang == 'ar' ? const Offset(-0.7, 2.0): const Offset(1.0, 2.0),
-                                          child: IconButton(
-                                            onPressed: () {
-                                              getImage();
-                                            },
-                                            icon: Image.asset(AppImages.camera,height: 40,)
+                                          FractionalTranslation(
+                                            translation :  lang == 'ar' ? const Offset(-.4, 1.333): const Offset(0.4, 1.333),
+                                            child: IconButton(
+                                              onPressed: () {
+                                                getImage();
+                                              },
+                                              icon: Image.asset(AppImages.camera,height: 30,)
+                                            ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
+                                        ],
+                                      ),
+                                    
+                                    ],
+                                  ),
                                     Container(
-                                      margin: EdgeInsets.only(left: 20,right: 20,top: 50),
-                                      width: Get.width/3.5,
-                                      child: Text(
-                                        box.read('name'),
-                                        style:AppTextStyles.appTextStyle(
-                                          fontSize: 18, fontWeight: FontWeight.bold, color:Colors.white
-                                        ),
+                                    margin: EdgeInsets.only(top: 20,),
+                                    child: Text(
+                                      box.read('name') !=null ?box.read('name') :'' ,
+                                      overflow: TextOverflow.ellipsis,
+                                      style:AppTextStyles.appTextStyle(
+                                        fontSize: 16, fontWeight: FontWeight.bold, color:Colors.white
                                       ),
                                     ),
-                                  ],
-                                ),
+                                  ),  
+                                ],
                               ),
+                              
                             ),                            
                           ],
                         ),
@@ -191,7 +188,7 @@ var lang;
                     ),
                    
                     Padding(
-                      padding: lang == 'en' ?  const EdgeInsets.only(top:20.0): const EdgeInsets.only(top:20.0,right: 10),
+                      padding: lang == 'en' ?  const EdgeInsets.only(top:00.0): const EdgeInsets.only(top:00.0,right: 10),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -206,54 +203,47 @@ var lang;
                           ),
                           SizedBox(height: 10,),
                           CustomListTile(AppImages.homeicon, 'home'.tr, ()  {
-                            Get.to(BottomTabs());
+                            Get.toNamed('/tabs');
                           },15.0 ),
                           CustomListTile(AppImages.ma, 'draftt'.tr, ()  {
-                            Get.off(DraftAds());
+                            Get.toNamed('/myDraft');
                           },15.0 ),
                           CustomListTile(AppImages.ma, 'my_ads'.tr, ()  {
-                           Get.off(MyAdds());
+                            Get.toNamed('/myAddsPage');
                           } ,15.0),
                           CustomListTile(AppImages.userProfile, 'profile'.tr, ()  {
-                            // Get.toNamed('/friendProfile');
-                            Get.off(UserProfile());
+                            Get.toNamed('/userProfile');
                           },15.0 ),
-                          // CustomListTile(AppImages.ma, 'my_ads'.tr, ()  {
-                          //  Get.to(MyAdds());
-                          // } ,15.0),
                           CustomListTile(AppImages.message, 'messeges'.tr, () {
-                            Get.off(Inbox());
+                            Get.toNamed('/inbox');
                           },15.0 ),
                           userType == 2 && accountType == 'Free'? Container():  accountType == 'Paid' ?
                           CustomListTile(AppImages.location, 'location'.tr, () {
-                            Get.off(MyLocations());
+                            Get.toNamed('/location');
                           },15.0 ):
                           CustomListTile(AppImages.location, 'location'.tr, () {
-                            Get.off(MyLocations());
+                            Get.toNamed('/location');
                           },15.0 ),
                           CustomListTile(AppImages.membership, 'membership'.tr, () {
-                            Get.off(IndividualMemeberShip());
+                            Get.to(IndividualMemeberShip());
                           },15.0 ),
                           CustomListTile(AppImages.notification, 'notification'.tr, () => {
-                            Get.off(NotificationPage())
+                            Get.toNamed('/notification')
                           },15.0 ),
                           CustomListTile(AppImages.freq, 'friend_requests'.tr, ()  {
-                           Get.off(FriendReqList());
+                           Get.toNamed('/friReq');
                           } ,15.0),
                            userType == 2  && accountType == 'Free' ? Container():  userType == 3 && accountType == "Paid" ? Container(): accountType == "Free" ? Container() :
                           CustomListTile(AppImages.offers, 'myoffer'.tr, () {
-                            Get.off(OffersDetail());
+                            Get.toNamed('/offerPage');
                           },15.0 ),
                           CustomListTile(AppImages.fav, 'favourite'.tr, () => {
-                            // Get.offAndToNamed('/favourities')
-                            Get.off(FavouritePage())
+                            Get.toNamed('/favourities')
                           },15.0 ), 
                            CustomListTile(AppImages.language, 'choose_language'.tr, () => {
-                            Get.to(ChooseLanguage())
+                            Get.toNamed('/chooseLang')
                           },15.0 ), 
-                          // SizedBox(height: 8.h),
                           Divider(),
-                          // SizedBox(height: 20.h),
                           Padding(
                             padding: const EdgeInsets.only(left:10.0),
                             child: Text(
@@ -264,20 +254,20 @@ var lang;
                               ),
                           ),
                           SizedBox(height: 10.h),
-                          CustomListTile(AppImages.aboutus, 'about_us'.tr, () => {
-                           Get.to(AboutUs())
+                          CustomListTile(AppImages.aboutus, 'aboutus'.tr, () => {
+                           Get.toNamed('/aboutUs')
                           },15.0 ),
                           CustomListTile(AppImages.privacy, 'privacy'.tr, () => {
-                            Get.off(Privacy())
+                            Get.toNamed('/privacy')
                           },15.0 ),
                           CustomListTile(AppImages.adwithus, 'advertise_with_us'.tr, () => {
-                           Get.off(AdvertisePage())
+                           Get.toNamed('/advertisement')
                           },15.0 ),
-                          CustomListTile(AppImages.ugr, 'agr'.tr, () => {
-                            Get.to(UserAgreement())
+                          CustomListTile(AppImages.ugr, 'UGR'.tr, () => {
+                            Get.toNamed('/userAgrement') 
                           },12.0 ),
                           CustomListTile(AppImages.contactus, 'contactus'.tr, () => {
-                           Get.off(Contact())
+                           Get.toNamed('/contact')
                           },15.0 ),
                           SizedBox(height: 10.h),
                           Divider(),
@@ -327,7 +317,7 @@ var lang;
                     TextStyle(
                       fontFamily: ArabicFonts.Cairo,
                       package: 'google_fonts_arabic',
-                      fontSize: 14.0,
+                      fontSize: 12.0,
                     ):
                     AppTextStyles.appTextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.grey.shade800,
                     )
